@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "10.x"
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -14,7 +15,6 @@
     "dotenv": "^8.2.0",
     "helmet": "^4.5.0",
     "macy": "^2.5.1",
-    "node-sass": "^5.0.0",
     "react": "^17.0.2",
     "react-bootstrap": "^1.5.2",
     "react-date-picker": "^8.1.1",
@@ -32,6 +32,7 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
     "sass": "^1.32.8",
+    "serve": "^12.0.0",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
