@@ -1,0 +1,17 @@
+@import "./scss/style.scss";
+
+.centered {
+    margin-left : 50%;
+    margin-top: 10%;
+    transform: translateX(-50%);
+    .loader-center {
+        display: flex;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .centered {
+        margin-top: 40%;
+    }
+}
