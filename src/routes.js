@@ -8,6 +8,11 @@ const Route = [
         component: Home,
         exact: true,
     },
+    {
+        path: "/:restaurantId/:tableNo",
+        component: Home,
+        exact: true,
+    },
     // {
     //     path: "/:userName/:productId",
     //     component: Detail,

@@ -1,14 +1,14 @@
 import { setAlert } from "./alert";
 import API from "../API";
 
-export const getProductByUserId = (userName , options = {}) => dispatch =>{
+export const getProductByUserId = (options = {}) => dispatch =>{
   try{
       
     dispatch({
       type : "PRODUCT_LIST_LOADING",
       data : true
     })
-    API.get('ProductList' , options, userName , function(res){
+    API.get('ProductList' , options, '' , function(res){
       
       if(res && res.data){
           dispatch( { type: "PRODUCT_LISTING",
@@ -18,6 +18,33 @@ export const getProductByUserId = (userName , options = {}) => dispatch =>{
             //console.log(res.data.message);
             res && res.data && dispatch(setAlert(res.data.message , 'danger'));    
         }
+    })
+    
+  } catch (err) {
+    console.log(err)
+    console.log(err)
+  }
+}
+
+export const getRestaurantById = (id) => dispatch =>{
+  try{
+      dispatch({
+          type : "PRODUCT_DETAIL_LOADING",
+          data : true
+      })
+    API.get('Restaurant' , {}, id , function(res){
+      
+      if(res && res.data){
+          dispatch( { type: "RESTAURANT_DETAIL",
+            data : res.data
+          });
+        } else {
+            res && res.data && dispatch(setAlert(res.data.message , 'danger'));    
+        }
+        dispatch({
+            type : "PRODUCT_DETAIL_LOADING",
+            data : false
+        })
     })
     
   } catch (err) {

@@ -16,11 +16,10 @@ const initialState = {
           return {...state , product_list_loading : data};
             
         case 'PRODUCT_LISTING':
-          return {...state , productList : data , product_list_loading : false};
-        case 'SINGLE_PRODUCT_DETAIL' :
-          return {...state , productDetail : data , product_detail_loading : false};
-        case 'USER_CONFIG':
-          return {...state , logo : data.style.logoUrl ,product_detail_loading : false, bannerUrl : data.style.bannerUrl , theme: data.style.bannerUrl , buttonColor : data.style.buttonColor};
+          return {...state , productList : data.results , product_list_loading : false};
+        case 'RESTAURANT_DETAIL':
+          localStorage.setItem("restaurant", JSON.stringify(data));
+          return {...state , restaurant : data , product_list_loading : false};
         default: return state;
     }
   }

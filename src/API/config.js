@@ -8,7 +8,10 @@ const getImageURL = (imgName) => IMAGE_URL.concat(imgName);
 
 const EndPoints = {
     ProductList: {
-        url: "api/product"
+        url: "api/common/product"
+    },
+    Restaurant: {
+        url: "api/common/restaurant"
     }
     
 };
