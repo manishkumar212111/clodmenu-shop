@@ -21,7 +21,7 @@ const instance = axios.create({
 
 const API = {
     get: (key, params = {}, id , cb) => {
-        const url = process.env.REACT_APP_SERVER_URL + EndPoints[key].url + (id ? `/${id}` : "");
+        const url = BASE_URL + EndPoints[key].url + (id ? `/${id}` : "");
         return instance.get(url, {
             params,
             headers: {
@@ -36,7 +36,7 @@ const API = {
     },
 
     post: (key, data = {}, id = '' , cb) => {
-        const url = process.env.REACT_APP_SERVER_URL + EndPoints[key].url + (id ? `/${id}` : "");
+        const url = BASE_URL + EndPoints[key].url + (id ? `/${id}` : "");
         
         return instance({
             'method': 'POST',
@@ -55,7 +55,7 @@ const API = {
     },
 
     patch: (key, data = {}, id = '', cb) => {
-        const url = process.env.REACT_APP_SERVER_URL + EndPoints[key].url + (id ? `/${id}` : "");
+        const url = BASE_URL + EndPoints[key].url + (id ? `/${id}` : "");
         return instance({
             'method': 'PATCH',
             'url': url,
@@ -73,7 +73,7 @@ const API = {
     },
 
     delete: (key, data = {}, id = '' , cb) => {
-        const url = process.env.REACT_APP_SERVER_URL + EndPoints[key].url + (id ? `/${id}` : "");
+        const url = BASE_URL + EndPoints[key].url + (id ? `/${id}` : "");
         return instance({
             'method': 'DELETE',
             'url': url,
