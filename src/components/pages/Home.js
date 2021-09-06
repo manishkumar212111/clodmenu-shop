@@ -56,7 +56,7 @@ const Home = (props) => {
         <div className="restaurant-details">
           <div className="container-fluid">
             <div className="restaurant-logo">
-              <img className="img-fluid" width="75" height="75" src={BASE_URL + restaurant.coverImage} alt="" />
+              <img className="img-fluid" width="75" height="75" src={BASE_URL + (restaurant.banner_url || restaurant.coverImage)} alt="" />
             </div>
             <div className="rest-name">
               <h4>{restaurant?.name}</h4>
