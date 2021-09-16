@@ -59,15 +59,15 @@ header {
   flex-direction: column;
   justify-content: center;
 }
-header a {
+header span {
   position: absolute;
   color: #2d2d2d;
   height: 30px;
 }
-header a:hover {
+header span:hover {
   color: #2d2d2d;
 }
-header a i {
+header span i {
   font-size: 30px;
 }
 header h4 {
@@ -713,7 +713,7 @@ img.right-icon {
   margin-bottom: 15px;
   height: 60px;
 }
-.add-dish a {
+.add-dish div {
   display: block;
   background-color: #FFE5E8;
   text-align: center;

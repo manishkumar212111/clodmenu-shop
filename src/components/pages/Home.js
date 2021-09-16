@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { getProductByUserId, getRestaurantById } from "../../actions/product";
 import { useDispatch } from "react-redux";
 import Shimmer from "../widgets/shimmerEffect";
@@ -10,37 +10,200 @@ import foodImg from "../../scss/img/food-img-1.png";
 
 import { connect } from "react-redux";
 import { BASE_URL } from "../../API/config";
+import Modifier from "./modifier";
 
+var delayTimer;
 const Home = (props) => {
-  const [restaurant , setRestaurant] = useState({}); 
-  const [products , setProducts] = useState({}); 
-  const [tableNo , setTableNo] = useState(props.match.params.tableNo);
+  const [restaurant, setRestaurant] = useState({});
+  const [products, setProducts] = useState({});
+  const [tableNo, setTableNo] = useState(props.match.params.tableNo);
   const [active, setActive] = useState(0);
+  const [cart, setCart] = useState({});
+  const [modifier, setModifiers] = useState(false);
+  const [activeProduct, setActiveProduct] = useState(false);
+
   useEffect(() => {
     props.getRestaurantById(props.match.params.restaurantId);
-    props.getProductByUserId( { restaurant : props.match.params.restaurantId, limit : 5000})
-  }, [props.getRestaurantById, props.getProductByUserId]);
+  }, [props.getRestaurantById]);
 
   useEffect(() => {
-    setRestaurant(props.restaurant)
+    setRestaurant(props.restaurant);
+    if(props.restaurant && props.restaurant.menu){
+      props.getProductByUserId({
+        // menu: props.restaurant.menu,
+        restaurant: props.match.params.restaurantId,
+        limit: 5000,
+      });
+    }
+    localStorage.setItem("tableNo" , props.match.params.tableNo) 
   }, [props.restaurant]);
 
-
   useEffect(() => {
-    setProducts(groupBy(props.productList));
-    setActive(Object.keys(groupBy(props.productList))[0]);
+    if (props.productList && props.productList.length) {
+      setProducts(groupBy(props.productList));
+      setActive(Object.keys(groupBy(props.productList))[0]);
+      setCart(localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : {})
+    }
   }, [props.productList]);
 
-  const groupBy = function(xs, key) {
-    return xs.reduce(function(rv, x) {
+  const handleScroll = (e) => {
+    document.querySelectorAll("#menu-list ul").forEach(function (itm) {
+      if (isScrolledIntoView(itm)) {
+        clearTimeout(delayTimer);
+        delayTimer = setTimeout(() => {
+          setActive(itm.id.replace("_", " "));
+        }, 50);
+      }
+    });
+  };
+
+  const handleCartAdd = (itm) => {
+      setModifiers(itm.modifierGroup);
+      setActiveProduct(itm);
+    
+
+    // let field = cart[itm.id] || {};
+    // if (!field.qty) {
+    //   field = {
+    //     categroyName: itm.category.name,
+    //     productTitle: itm.title,
+    //   };
+    // }
+
+    // field.qty = (field.qty || 0) + 1;
+    // field.price = itm.sellingPrice;
+
+    // setCart((crt) => ({ ...crt, [itm.id]: field }));
+  };
+
+  const handleCartAddCb = (product, id) => {
+      setCart((crt) => ({ ...crt, [id] :product }));
+      setActiveProduct(false);
+      setModifiers([]);
+      
+      setTimeout(() => {
+        localStorage.setItem("cart", JSON.stringify({ ...cart, [id] :product }));
+      },100)
+
+  };
+
+  const handleCartRemove = (itm) => {
+    let field = cart[itm.id] || {};
+    field.qty = (field.qty || 0) - 1;
+    if (field.qty == 0) {
+      field[itm.id] = null;
+    }
+    setCart((crt) => ({ ...crt, [itm.id]: field }));
+  };
+  const isScrolledIntoView = (ele) => {
+    const { top, bottom } = ele.getBoundingClientRect();
+    const vHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    return (top > 0 || bottom > 0) && top < vHeight;
+  };
+
+  // useEffect(() => {
+  //   localStorage.setItem("cart", JSON.stringify(cart));
+  // }, [cart]);
+  useEffect(() => {
+    document.addEventListener("scroll", handleScroll);
+    return () => document.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const groupBy = function (xs, key) {
+    return xs.reduce(function (rv, x) {
       (rv[x.category?.name] = rv[x.category?.name] || []).push(x);
       return rv;
     }, {});
   };
-  console.log(props, active, products[active]);
-  if(props.product_detail_loading || props.product_list_loading){
-    return <Shimmer />
+
+  const handleCategoryClick = (id) => {
+    let doc = document.getElementById(id.replace(" ", "_"));
+    if (id) {
+      doc.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest",
+      });
+    }
+    setActive(id);
+  };
+  console.log(cart);
+  if (props.product_detail_loading || props.product_list_loading) {
+    return <Shimmer />;
   }
+
+  const renderCartPopup = () => {
+    let price = getPriceCountInCart();
+    // let itemCount = 0;
+    // Object.keys(cart).map((itm) => {
+    //   if (cart[itm] && cart[itm].qty) {
+    //     itemCount += cart[itm].qty;
+    //     price += cart[itm].qty * parseInt(cart[itm].price);
+    //   }
+    // });
+    console.log(price);
+    return price > 0 ? (
+      <div className="view-cart order-btn">
+        <div className="container-fluid">
+          <a href="/cart">
+            <p>
+              {getTotalProductCount()} items in cart <span>${price}</span>
+            </p>
+            <h5>
+              view cart <i className="bx bx-chevron-right"></i>
+            </h5>
+          </a>
+        </div>
+      </div>
+    ) : (
+      <></>
+    );
+  };
+
+  const getProductCountInCart = (id) => {
+    let cartObj = cart[id];
+    if(!cartObj){
+      return "";
+    } else{
+      let temp = 0;
+      Object.keys(cartObj).map(itm => {
+        temp += cartObj[itm].qty;
+      })
+      return temp;
+    }
+  }
+
+  const getTotalProductCount = () => {
+    let count = 0;
+    Object.keys(cart).map(itm => {
+      count += getProductCountInCart(itm)
+    })
+    return count;
+  }
+
+  const getPriceCountInCart = () => {
+    if(!cart){
+      return 0;
+    } else{
+      let temp = 0;
+      Object.keys(cart).map(itm => {
+        Object.keys(cart[itm]).map(item => {
+          temp += cart[itm][item].price * cart[itm][item].qty;
+          if(cart[itm][item].modifiers){
+            Object.keys(cart[itm][item].modifiers).map(data => {
+              console.log(cart[itm][item].modifiers[data], data)
+              cart[itm][item].modifiers[data].map(dta => {
+                temp += dta.price * cart[itm][item].qty
+              }) 
+            })
+          }
+        })
+      })
+      return temp;
+    }
+  }
+
   return (
     <>
       <section data-select-name className="restaurant-header">
@@ -56,14 +219,23 @@ const Home = (props) => {
         <div className="restaurant-details">
           <div className="container-fluid">
             <div className="restaurant-logo">
-              <img className="img-fluid" width="75" height="75" src={BASE_URL + (restaurant.banner_url || restaurant.coverImage)} alt="" />
+              <img
+                className="img-fluid"
+                width="75"
+                height="75"
+                src={
+                  BASE_URL + (restaurant.banner_url || restaurant.coverImage)
+                }
+                alt=""
+              />
             </div>
             <div className="rest-name">
               <h4>{restaurant?.name}</h4>
               <div className="rest-contact">
                 <div className="contact-item">
                   <p>
-                    <img src={orderTable} alt="" /> Table {tableNo? tableNo: ""}
+                    <img src={orderTable} alt="" /> Table{" "}
+                    {tableNo ? tableNo : ""}
                   </p>
                 </div>
               </div>
@@ -76,289 +248,83 @@ const Home = (props) => {
         <div className="container-fluid">
           <h3>MENU</h3>
           <nav className="navigation" id="mainNav">
-            {Object.keys(products).map((itm , index) => (
-              <span onClick={() => setActive(itm)} className={`navigation__link ${itm === active ? "active" : ""}`}>
+            {Object.keys(products).map((itm, index) => (
+              <span
+                onClick={() => handleCategoryClick(itm)}
+                className={`navigation__link ${itm === active ? "active" : ""}`}
+              >
                 {itm}
               </span>
             ))}
           </nav>
-          <div className="menu-list">
-            <ul className="page-section hero" id="chinese">
-              {
-                products[active] && products[active].map((itm) => (
-                  <li>
-                  <div className="dish-name">
-                    <h4>{itm.title}</h4>
-                    <p className="more">
-                      {itm.description}
-                    </p>
-                    <h5>$ {itm.sellingPrice}</h5>
-                  </div>
-                  <div className="dish-img">
-                    <img width="35" height="40" src={BASE_URL+itm.imageUrl} alt="" />
-                    <div className="add-dish">
-                      <a id="two" className="button" href="javascript:void(0)">
-                        ADD
-                      </a>
-                      {/* <span>99</span> */}
-                    </div>
-                  </div>
-                </li>
-             
-                ))
-              }
-            </ul>
+          <div className="menu-list" id="menu-list">
+            {Object.keys(products).map((item, index) => (
+              <ul className="page-section hero" id={item.replace(" ", "_")}>
+                {products[item] &&
+                  products[item].map((itm, index) => (
+                    <li>
+                      <div className="dish-name">
+                        <h4>{itm.title}</h4>
+                        <p className="more">{itm.description}</p>
+                        <h5>$ {itm.sellingPrice}</h5>
+                      </div>
+                      <div className="dish-img">
+                        <img
+                          width="35"
+                          height="40"
+                          src={BASE_URL + itm.imageUrl}
+                          alt=""
+                        />
+                        <div className="add-dish">
+                          <div
+                            id="two"
+                            className="button"
+                            onClick={() => handleCartAdd(itm)}
+                          >
+                            ADD
+                          </div>
+                            <>
+                              {getProductCountInCart(itm.id) ? <span>{getProductCountInCart(itm.id)}</span> : ""}
+                              {/* <div
+                                id="two"
+                                className="button"
+                                onClick={() => handleCartRemove(itm)}
+                              >
+                                Remove
+                              </div> */}
+                            </>
+                          
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* <div className="view-cart order-btn">
-        <div className="container-fluid">
-          <a href="cart.html">
-            <p>
-              5 items in cart <span>$36</span>
-            </p>
-            <h5>
-              view cart <i className="bx bx-chevron-right"></i>
-            </h5>
-          </a>
-        </div>
-      </div> */}
-
-      <div id="modal-container" tabindex="-1">
-        <div className="modal-background">
-          <div id="close">
-            <i className="bx bx-x"></i>
-          </div>
-          <div className="modal">
-            <div className="pop-up-body">
-              <div className="popup-banner">
-                <img src="assets/img/restaurant-2.jpg" alt="" />
-              </div>
-              <div className="container-fluid">
-                <div className="pop-dish-name">
-                  <h4>Veg Salami Pizza</h4>
-                  <h5>270 cal</h5>
-                </div>
-                <div className="dish-desc">
-                  <p>
-                    Spread the tomato sauce over the dough. Sprinkle with
-                    cheese, top with the vegetables, drizzle with olives.
-                  </p>
-                </div>
-                <div className="dis-topping">
-                  <h3>
-                    Size <span className="required">Required</span>
-                  </h3>
-                  <ul>
-                    <li>
-                      <p>Small</p>
-                      <div className="radio-item">
-                        <span for="table-order">$7</span>
-                        <input
-                          type="radio"
-                          id="table-order"
-                          name="order"
-                          value="table"
-                        />
-                        <label for="table-order"></label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Medium</p>
-                      <div className="radio-item">
-                        <span for="table-order">$9</span>
-                        <input
-                          type="radio"
-                          id="table-order1"
-                          name="order"
-                          value="table"
-                        />
-                        <label for="table-order1"></label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Large</p>
-                      <div className="radio-item">
-                        <span for="table-order">$11</span>
-                        <input
-                          type="radio"
-                          id="table-order2"
-                          name="order"
-                          value="table"
-                        />
-                        <label for="table-order2"></label>
-                      </div>
-                    </li>
-                  </ul>
-                  <h3>
-                    Crust <span className="optional">Optional</span>
-                  </h3>
-                  <ul>
-                    <li>
-                      <p>Hand Toasted</p>
-                      <div className="radio-item">
-                        <input
-                          type="radio"
-                          id="table-order3"
-                          name="order1"
-                          value="table"
-                        />
-                        <label for="table-order3"></label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Cheese Burst</p>
-                      <div className="radio-item">
-                        <input
-                          type="radio"
-                          id="table-order4"
-                          name="order1"
-                          value="table"
-                        />
-                        <label for="table-order4"></label>
-                      </div>
-                    </li>
-                  </ul>
-                  <h3>
-                    Toppings <span className="optional">Optional</span>
-                  </h3>
-                  <ul>
-                    <li>
-                      <p>Mushroom</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" checked="checked" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Olive</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Panner</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Baby Corn</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                  </ul>
-                  <h3>
-                    Cheese <span className="optional">Optional</span>
-                  </h3>
-                  <ul>
-                    <li>
-                      <p>Mozzarella</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" checked="checked" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Peri peri Cheese</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Chipotle cheese</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                    <li>
-                      <p>Tandori cheese</p>
-                      <div className="checkbox-item">
-                        <span>$2</span>
-                        <label className="check-container">
-                          <input type="checkbox" />
-                          <span className="checkmark"></span>
-                        </label>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="order-btn">
-              <div className="container-fluid">
-                <div className="quantity-wraper">
-                  <div
-                    className="value-button"
-                    id="decrease"
-                    onclick="decreaseValue1()"
-                    value="Decrease Value"
-                  >
-                    -
-                  </div>
-                  <input type="number" id="number1" value="1" />
-                  <div
-                    className="value-button"
-                    id="increase"
-                    onclick="increaseValue1()"
-                    value="Increase Value"
-                  >
-                    +
-                  </div>
-                </div>
-                <a className="add-item-close" href="javascript:void(0)">
-                  <h5>ADD ITEM</h5>
-                  <p>
-                    Total <span>$36</span>
-                  </p>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {cart && renderCartPopup()}
+      <Modifier 
+        modifier={modifier}
+        activeProduct={activeProduct}
+        handleClose={() => {setActiveProduct(""); setModifiers("")}}
+        handleCartAdd={handleCartAddCb}
+        alreadyInCart = { cart[activeProduct.id] ? cart[activeProduct.id] : {}}
+      />                      
     </>
   );
 };
-const mapStateToProps = ( state ) => ( {
+const mapStateToProps = (state) => ({
   productList: state.product.productList,
-  product_detail_loading : state.product.product_detail_loading,
-  product_list_loading : state.product.product_list_loading,
-  restaurant : state.product.restaurant,
-} );
+  product_detail_loading: state.product.product_detail_loading,
+  product_list_loading: state.product.product_list_loading,
+  restaurant: state.product.restaurant,
+});
 
 const mapDispatchToProps = {
   getProductByUserId,
-  getRestaurantById
+  getRestaurantById,
 };
 
-export default connect( mapStateToProps, mapDispatchToProps )( Home );
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
