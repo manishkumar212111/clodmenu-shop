@@ -1,7 +1,8 @@
 import { combineReducers } from "redux";
 
 import alert from "./alert";
-import product from './product'
+import product from './product';
+import order from './order';
 const sessionReducer = ( state = false, action ) => {
     switch ( action.type ) {
         case "INITIALIZE_SESSION":
@@ -13,7 +14,8 @@ const sessionReducer = ( state = false, action ) => {
 const appReducers = combineReducers({
     sessionReducer,
     alert,
-    product
+    product,
+    order
 });
 
 const rootReducer = (state, action) => {

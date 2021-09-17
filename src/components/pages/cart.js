@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { create } from "../../actions/order";
+import { connect } from "react-redux";
 
-const Cart = () => {
+const Cart = (props) => {
   const [cart, setCart] = useState({});
   const [showPayment, setShowPayment] = useState(false);
   const [orderObj, setOrderObj] = useState({
@@ -12,11 +14,19 @@ const Cart = () => {
     type: "cash",
     cardDetails: {},
   });
+
   useEffect(() => {
     localStorage.getItem("cart") &&
       typeof JSON.parse(localStorage.getItem("cart")) == "object" &&
       setCart(JSON.parse(localStorage.getItem("cart")));
   }, [localStorage.getItem("cart")]);
+
+  useEffect(() => {
+    if (props?.orderDetail?.id) {
+      setCart({});
+      localStorage.removeItem("cart");
+    }
+  }, [props?.orderDetail?.id]);
 
   useEffect(() => {
     setOrderObj((ord) => ({
@@ -118,6 +128,91 @@ const Cart = () => {
       return temp;
     }
   };
+  console.log(props);
+  const handleCreateOrder = () => {
+    props.create({
+      orderNote: orderObj.orderNote,
+      orderType: orderObj.orderType,
+      products: cart,
+      tableNo:localStorage.getItem("tableNo"),
+      restaurant: localStorage.getItem("restaurant")
+        ? JSON.parse(localStorage.getItem("restaurant")).id
+        : "",
+      subTotalAmount: getPriceCountInCart(),
+      tax: 0,
+      totalAmount: getPriceCountInCart(),
+      paymentType: paymentObj.type,
+      paymentStatus:
+        paymentObj.type == "cash" || paymentObj.type == "mada"
+          ? "To pay"
+          : "pending",
+    });
+  };
+  if (props.order_detail_loading) {
+    return (
+      <section class="app-body">
+        <header>
+          <div class="container-fluid d-flex">
+            <h4>Order</h4>
+          </div>
+        </header>
+
+        <div class="browser-main">
+          <div class="thank-img">
+            <div class="container-fluid">
+              <img
+                class="img-fluid"
+                src={
+                  "https://ik.imagekit.io/lcq5etn9k/restro/food_animation_TTfBghWXxl.gif"
+                }
+                alt=""
+              />
+              <p>Creating order, Please wait</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (props?.orderDetail?.id) {
+    return (
+      <section class="app-body">
+        <header>
+          <div class="container-fluid d-flex">
+            <h4>Order on the way</h4>
+          </div>
+        </header>
+
+        <div class="browser-main">
+          <div class="thank-img">
+            <div class="container-fluid">
+              <img
+                class="img-fluid"
+                src={
+                  "https://ik.imagekit.io/lcq5etn9k/restro/food_animation_TTfBghWXxl.gif"
+                }
+                alt=""
+              />
+              <p>
+                We have start preparing your order, it will be served you soon
+              </p>
+              <h3>Order Number - {props?.orderDetail?.orderNo}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-btn">
+          <div class="container-fluid">
+            <h4>Missed Something ?</h4>
+            <a onClick={() => window.history.go(-1)}>
+              <h6>Order More</h6>
+            </a>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (!Object.keys(cart).length) {
     return (
@@ -141,6 +236,7 @@ const Cart = () => {
     );
   }
 
+  
   if (showPayment) {
     return (
       <section className="app-body">
@@ -387,10 +483,16 @@ const Cart = () => {
                   alt=""
                 /> */}
                 {paymentObj.type == "card"
-                  ? `Card ${paymentObj?.cardDetails?.cardNumber ? "(Ending with "+ paymentObj?.cardDetails?.cardNumber.slice(
-                      paymentObj?.cardDetails?.cardNumber.length - 4,
-                      paymentObj?.cardDetails?.cardNumber.length
-                    ) + ")" : "" }`
+                  ? `Card ${
+                      paymentObj?.cardDetails?.cardNumber
+                        ? "(Ending with " +
+                          paymentObj?.cardDetails?.cardNumber.slice(
+                            paymentObj?.cardDetails?.cardNumber.length - 4,
+                            paymentObj?.cardDetails?.cardNumber.length
+                          ) +
+                          ")"
+                        : ""
+                    }`
                   : paymentObj.type == "mada"
                   ? "Mada"
                   : "Cash"}{" "}
@@ -504,7 +606,7 @@ const Cart = () => {
 
       {!showPayment && (
         <div className="order-btn">
-          <div className="container-fluid">
+          <div className="container-fluid" onClick={handleCreateOrder}>
             <a>
               <p>
                 Total <span>SR {getPriceCountInCart()}</span>
@@ -520,4 +622,14 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+const mapStateToProps = (state) => ({
+  orderDetail: state.order.orderDetail,
+  order_detail_loading: state.order.order_detail_loading,
+  orderError: state.order.orderError,
+});
+
+const mapDispatchToProps = {
+  create,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);
