@@ -30,7 +30,7 @@ const Home = (props) => {
     setRestaurant(props.restaurant);
     if(props.restaurant && props.restaurant.menu){
       props.getProductByUserId({
-        // menu: props.restaurant.menu,
+        menu: props.restaurant.menu,
         restaurant: props.match.params.restaurantId,
         limit: 5000,
       });
