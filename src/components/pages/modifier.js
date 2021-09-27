@@ -2,9 +2,36 @@ import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../API/config";
 
 const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alreadyInCart}) => {
+  console.log(activeProduct)
   const [selectedModifiers, setSelectedModifier] = useState({});
   const [finalProduct, setProduct] = useState(alreadyInCart || {});
+  const [activeItem , setActiveItem] = useState({
+      
+  });
 
+  useEffect(() => {
+    activeProduct.id && setActiveItem({
+      [activeProduct.id] : {
+        qty: 1,
+        title: activeProduct.title,
+        price: activeProduct.sellingPrice,
+        modifiers: [],
+      }
+    })
+  }, [activeProduct])
+  useEffect(() => {
+    if(Object.keys(selectedModifiers).length){
+      let tempName = getSelectedModifiersName(selectedModifiers);
+      setActiveItem({
+        [activeProduct.id + tempName] : {
+          qty: 1,
+          title: activeProduct.title,
+          price: activeProduct.sellingPrice,
+          modifiers: selectedModifiers,
+        }
+      })
+    }
+  }, [selectedModifiers])
   const handleRadioClick = (itm, mainItem) => {
     console.log(itm);
     setSelectedModifier((fld) => ({
@@ -120,21 +147,31 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
   };
 
   const handleIncreaseProduct = () => {
-    console.log("dsvjbjb");
-    const tempName = getSelectedModifiersName(selectedModifiers);
-    setProduct((product) => ({
-      ...product,
-      [activeProduct.id + tempName]: {
-        qty:
-          product[activeProduct.id + tempName] &&
-          product[activeProduct.id + tempName]["qty"]
-            ? product[activeProduct.id + tempName]["qty"] + 1
-            : 1,
-        title: activeProduct.title,
-        price: activeProduct.sellingPrice,
-        modifiers: selectedModifiers,
-      },
+    let currentActiveItem = Object.keys(activeItem)[0];
+    let newItem= activeItem;
+    if(finalProduct[currentActiveItem]){
+      newItem = { [currentActiveItem] : {...activeItem[currentActiveItem], qty: finalProduct[currentActiveItem].qty + 1 }}
+    }
+    console.log(newItem, currentActiveItem)
+
+    setProduct((product) => ({...product, 
+      ...newItem
     }));
+    // console.log("dsvjbjb");
+    // const tempName = getSelectedModifiersName(selectedModifiers);
+    // setProduct((product) => ({
+    //   ...product,
+    //   [activeProduct.id + tempName]: {
+    //     qty:
+    //       product[activeProduct.id + tempName] &&
+    //       product[activeProduct.id + tempName]["qty"]
+    //         ? product[activeProduct.id + tempName]["qty"] + 1
+    //         : 1,
+    //     title: activeProduct.title,
+    //     price: activeProduct.sellingPrice,
+    //     modifiers: selectedModifiers,
+    //   },
+    // }));
   };
 
   console.log(selectedModifiers);
@@ -145,22 +182,44 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
       count: 0,
       price: 0,
     };
+    console.log(finalProduct[Object.keys(activeItem)[0]])
+    if(Object.keys(activeItem)[0]){
+      let newFinalProduct = {...finalProduct, ...{[Object.keys(activeItem)[0]] : finalProduct[Object.keys(activeItem)[0]] ? { ...finalProduct[Object.keys(activeItem)[0]] , qty : finalProduct[Object.keys(activeItem)[0]].qty + 1} :  activeItem[Object.keys(activeItem)[0]] }};
 
-    finalProduct &&
-      Object.keys(finalProduct).map((itm) => {
-        obj.count += parseInt(finalProduct[itm].qty);
-        obj.price += parseInt(finalProduct[itm].price) * parseInt(finalProduct[itm].qty);
-        Object.keys(finalProduct[itm].modifiers).map(dta => {
-          console.log(finalProduct[itm].modifiers , dta)
-          let temp = 0;
-           finalProduct[itm].modifiers[dta].map(it => {temp += parseInt(it.price)});
-           obj.price += temp * parseInt(finalProduct[itm].qty);
-        })
-      });
-    
-      console.log(finalProduct, obj)
-      return obj;
+      console.log(newFinalProduct);
+      newFinalProduct &&
+        Object.keys(newFinalProduct).map((itm) => {
+          obj.count += parseInt(newFinalProduct[itm].qty);
+          obj.price += parseInt(newFinalProduct[itm].price) * parseInt(newFinalProduct[itm].qty);
+          Object.keys(newFinalProduct[itm].modifiers).map(dta => {
+            console.log(newFinalProduct[itm].modifiers , dta)
+            let temp = 0;
+            newFinalProduct[itm].modifiers[dta].map(it => {temp += parseInt(it.price)});
+             obj.price += temp * parseInt(newFinalProduct[itm].qty);
+          })
+        });
+      
+        console.log(newFinalProduct, obj)
+   
+    }
+    return obj;
   };
+  
+  const handleAddItem = () => {
+    let currentActiveItem = Object.keys(activeItem)[0];
+    let newItem= activeItem;
+    if(finalProduct[currentActiveItem]){
+      newItem = { [currentActiveItem] : {...activeItem[currentActiveItem], qty: finalProduct[currentActiveItem].qty + 1 }}
+    }
+    console.log(newItem, currentActiveItem)
+
+    handleCartAdd({...finalProduct , ...newItem}, activeProduct.id)
+
+  };
+
+  if(!activeProduct){
+    return null;
+  }
   return (
     <>
       <div
@@ -184,7 +243,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
               <div className="container-fluid">
                 <div className="pop-dish-name">
                   <h4>{activeProduct.title}</h4>
-                  <h5>270 cal</h5>
+                  <h5>Calorie: {activeProduct.calorie}</h5>
                 </div>
                 <div className="dish-desc">
                   <p>{activeProduct.description}</p>
@@ -314,7 +373,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                   </div>
                 </div>
                 <a className="add-item-close" href="javascript:void(0)">
-                <h5 onClick={() => (getProductCount().count ? handleCartAdd(finalProduct, activeProduct.id): () => {} )}>ADD ITEM</h5>
+                <h5 onClick={() => (getProductCount().count ? handleAddItem(): () => {} )}>ADD ITEM</h5>
                   <p>
                     Total <span>${getProductCount().price}</span>
                   </p>

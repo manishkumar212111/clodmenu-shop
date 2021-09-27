@@ -7,6 +7,7 @@ import TopImg from "../../scss/img/restaurant-interior.jpg";
 import logo from "../../scss/img/rest-logo.png";
 import orderTable from "../../scss/img/order-table.png";
 import foodImg from "../../scss/img/food-img-1.png";
+import { setLanguage } from "../../actions/language";
 
 import { connect } from "react-redux";
 import { BASE_URL } from "../../API/config";
@@ -21,7 +22,7 @@ const Home = (props) => {
   const [cart, setCart] = useState({});
   const [modifier, setModifiers] = useState(false);
   const [activeProduct, setActiveProduct] = useState(false);
-
+  const [language, setLanguage] = useState("en");
   useEffect(() => {
     props.getRestaurantById(props.match.params.restaurantId);
   }, [props.getRestaurantById]);
@@ -37,6 +38,10 @@ const Home = (props) => {
     }
     localStorage.setItem("tableNo" , props.match.params.tableNo) 
   }, [props.restaurant]);
+
+  useEffect(() => {
+      setLanguage(localStorage.getItem("language") | 'en')  
+  }, [props.language]);
 
   useEffect(() => {
     if (props.productList && props.productList.length) {
@@ -210,9 +215,9 @@ const Home = (props) => {
         <div className="restaurant-image">
           <img height="160" src={BASE_URL + restaurant.coverImage} alt="" />
           <div className="lang-select select_location">
-            <select id="mounth">
-              <option value="EN">EN</option>
-              <option value="arabic/index.html">AR</option>
+            <select id="mounth" value={localStorage.getItem("language") || "en"}  onChange={(e) => props.setLanguage(e.target.value)}>
+              <option value="en">EN</option>
+              <option value="ar">AR</option>
             </select>
           </div>
         </div>
@@ -269,12 +274,12 @@ const Home = (props) => {
                         <h5>$ {itm.sellingPrice}</h5>
                       </div>
                       <div className="dish-img">
-                        <img
+                        {itm.imageUrl && <img
                           width="35"
                           height="40"
                           src={BASE_URL + itm.imageUrl}
                           alt=""
-                        />
+                        />}
                         <div className="add-dish">
                           <div
                             id="two"
@@ -320,11 +325,14 @@ const mapStateToProps = (state) => ({
   product_detail_loading: state.product.product_detail_loading,
   product_list_loading: state.product.product_list_loading,
   restaurant: state.product.restaurant,
+  language: state.language.language,
 });
 
 const mapDispatchToProps = {
   getProductByUserId,
   getRestaurantById,
+  setLanguage
+
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

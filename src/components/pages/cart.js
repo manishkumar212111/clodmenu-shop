@@ -160,13 +160,13 @@ const Cart = (props) => {
         <div class="browser-main">
           <div class="thank-img">
             <div class="container-fluid">
-              <img
+              {/* <img
                 class="img-fluid"
                 src={
-                  "https://ik.imagekit.io/lcq5etn9k/restro/food_animation_TTfBghWXxl.gif"
+                  "https://ik.imagekit.io/lcq5etn9k/restro/Group_g-O576nIx.png"
                 }
                 alt=""
-              />
+              /> */}
               <p>Creating order, Please wait</p>
             </div>
           </div>
@@ -177,7 +177,7 @@ const Cart = (props) => {
 
   if (props?.orderDetail?.id) {
     return (
-      <section class="app-body">
+      <section class="app-body" style={{backgroundColor: "white"}}>
         <header>
           <div class="container-fluid d-flex">
             <h4>Order on the way</h4>
@@ -188,13 +188,13 @@ const Cart = (props) => {
           <div class="thank-img">
             <div class="container-fluid">
               <img
-                class="img-fluid"
+                class="img-fluid mt-5"
                 src={
-                  "https://ik.imagekit.io/lcq5etn9k/restro/food_animation_TTfBghWXxl.gif"
+                  "https://ik.imagekit.io/lcq5etn9k/restro/Group_g-O576nIx.png"
                 }
                 alt=""
               />
-              <p>
+              <p className="mt-5">
                 We have start preparing your order, it will be served you soon
               </p>
               <h3>Order Number - {props?.orderDetail?.orderNo}</h3>
