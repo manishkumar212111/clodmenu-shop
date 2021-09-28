@@ -153,7 +153,7 @@ const Home = (props) => {
         <div className="container-fluid">
           <a href="/cart">
             <p>
-              {getTotalProductCount()} items in cart <span>${price}</span>
+              {getTotalProductCount()} items in cart <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {price}</span>
             </p>
             <h5>
               view cart <i className="bx bx-chevron-right"></i>
@@ -271,7 +271,7 @@ const Home = (props) => {
                       <div className="dish-name">
                         <h4>{itm.title}</h4>
                         <p className="more">{itm.description}</p>
-                        <h5>$ {itm.sellingPrice}</h5>
+                        <h5><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {itm.sellingPrice}</h5>
                       </div>
                       <div className="dish-img">
                         {itm.imageUrl && <img

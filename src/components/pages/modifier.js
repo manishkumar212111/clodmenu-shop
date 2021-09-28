@@ -272,7 +272,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                                     <p>{it.name}</p>
                                     <div className="radio-item">
                                       <span for="table-order">
-                                        {"$"}
+                                        <span className="arabicRs">S<span className="arabicSmallRs">R</span></span>
                                         {it.price}
                                       </span>
                                       <input
@@ -309,7 +309,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                                     <p>{it.name}</p>
                                     <div className="checkbox-item">
                                       <span>
-                                        {"$"}
+                                      <span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span>
                                         {it.price}
                                       </span>
                                       <label className="check-container">
@@ -375,7 +375,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                 <a className="add-item-close" href="javascript:void(0)">
                 <h5 onClick={() => (getProductCount().count ? handleAddItem(): () => {} )}>ADD ITEM</h5>
                   <p>
-                    Total <span>${getProductCount().price}</span>
+                    Total <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getProductCount().price}</span>
                   </p>
                 </a>
               </div>

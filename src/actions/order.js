@@ -29,6 +29,9 @@ export const create = (data) => dispatch =>{
             type : "ORDER_DETAIL_LOADING",
             data : true
         })
+        if(!data.orderNote){
+          delete data.orderNote;
+        }
       API.post('Orders' , data ,'', function(res){
         console.log(res);
         if(res && res.data.id){

@@ -458,7 +458,7 @@ const Cart = (props) => {
                     </div>
                     <div className="dish-cost">
                       <h5>
-                        ${getSingleProductCount(cart[itm][item]).price}
+                      <span style={{marginRight : 2}} className="arabicRs">S<span className="arabicSmallRs">R </span></span>  {getSingleProductCount(cart[itm][item]).price}
                         <a onClick={() => deleteProductFromCart(item, itm)}>
                           <i className="bx bx-trash-alt"></i>
                         </a>
@@ -590,7 +590,7 @@ const Cart = (props) => {
           <div className="container-fluid">
             <div className="total">
               <p>Item Total</p>
-              <p className="price-total">${getPriceCountInCart()}</p>
+              <p className="price-total"><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getPriceCountInCart()}</p>
             </div>
             <div className="total">
               <p>Sales Tax</p>
@@ -598,7 +598,7 @@ const Cart = (props) => {
             </div>
             <div className="total all-total">
               <p>Total</p>
-              <p>${getPriceCountInCart()}</p>
+              <p><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span>{getPriceCountInCart()}</p>
             </div>
           </div>
         </div>
