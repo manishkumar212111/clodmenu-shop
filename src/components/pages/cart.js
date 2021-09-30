@@ -5,13 +5,16 @@ import { connect } from "react-redux";
 const Cart = (props) => {
   const [cart, setCart] = useState({});
   const [showPayment, setShowPayment] = useState(false);
+  const [restaurant, setRestaurant] = useState(
+    JSON.parse(localStorage.getItem("restaurant"))
+  );
   const [orderObj, setOrderObj] = useState({
     orderType: "dinein",
     tableNo: localStorage.getItem("tableNo"),
     orderNote: "",
   });
   const [paymentObj, setPaymentObj] = useState({
-    type: "cash",
+    type: "",
     cardDetails: {},
   });
 
@@ -19,6 +22,8 @@ const Cart = (props) => {
     localStorage.getItem("cart") &&
       typeof JSON.parse(localStorage.getItem("cart")) == "object" &&
       setCart(JSON.parse(localStorage.getItem("cart")));
+
+      setRestaurant(JSON.parse(localStorage.getItem("restaurant")))
   }, [localStorage.getItem("cart")]);
 
   useEffect(() => {
@@ -130,6 +135,11 @@ const Cart = (props) => {
   };
   console.log(props);
   const handleCreateOrder = () => {
+    if(!(paymentObj && paymentObj.type)){
+      
+      return;
+    }
+
     props.create({
       orderNote: orderObj.orderNote,
       orderType: orderObj.orderType,
@@ -255,7 +265,7 @@ const Cart = (props) => {
               <div className="pay-method">
                 <h4>Payment method</h4>
                 <ul className="payment-option">
-                  <li
+                  {restaurant?.menu?.settings?.payment.cash && <li
                     onClick={() =>
                       setPaymentObj((pto) => ({ ...pto, type: "cash" }))
                     }
@@ -263,8 +273,8 @@ const Cart = (props) => {
                     <a className={paymentObj.type == "cash" ? "active" : ""}>
                       <i className="bx bx-wallet"></i> Pay Cash
                     </a>
-                  </li>
-                  <li
+                  </li>}
+                  {restaurant?.menu?.settings?.payment.creditCard && <li
                     onClick={() =>
                       setPaymentObj((pto) => ({ ...pto, type: "card" }))
                     }
@@ -272,8 +282,8 @@ const Cart = (props) => {
                     <a className={paymentObj.type == "card" ? "active" : ""}>
                       <i className="bx bx-credit-card-alt"></i> Pay Via Card
                     </a>
-                  </li>
-                  <li
+                  </li>}
+                  {restaurant?.menu?.settings?.payment.mada && <li
                     onClick={() =>
                       setPaymentObj((pto) => ({ ...pto, type: "mada" }))
                     }
@@ -289,7 +299,7 @@ const Cart = (props) => {
                       </i>{" "}
                       MADA
                     </a>
-                  </li>
+                  </li>}
                 </ul>
               </div>
 
@@ -392,7 +402,7 @@ const Cart = (props) => {
                   </div>
                 </div>
               )}
-              {paymentObj.type !== "card" && (
+              {(paymentObj.type === "mada" || paymentObj.type === "cash")  && (
                 <div class="cash-content">
                   <img
                     class="img-fluid"
@@ -410,7 +420,7 @@ const Cart = (props) => {
 
         <div className="order-btn">
           <div className="container-fluid">
-            <a onClick={() => setShowPayment(false)}>
+            <a onClick={() => {paymentObj.type && setShowPayment(false)}}>
               <h6>{paymentObj.type == "card" ? "use this card" : "Select"}</h6>
             </a>
           </div>
@@ -495,7 +505,7 @@ const Cart = (props) => {
                     }`
                   : paymentObj.type == "mada"
                   ? "Mada"
-                  : "Cash"}{" "}
+                  : paymentObj.type === "cash" ? "Cash" : "Select"}
                 <i className="bx bx-chevron-right"></i>
               </p>
             </a>
@@ -550,7 +560,7 @@ const Cart = (props) => {
                     </p>
                   )}
                 </li>
-                <li>
+                {restaurant?.menu?.settings?.takeAwayOrder && <li>
                   <div className="radio-item">
                     <input
                       type="radio"
@@ -580,7 +590,7 @@ const Cart = (props) => {
                       Take Away
                     </label>
                   </div>
-                </li>
+                </li>}
               </ul>
             </div>
           </div>

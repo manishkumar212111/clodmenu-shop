@@ -31,12 +31,14 @@ const Home = (props) => {
     setRestaurant(props.restaurant);
     if(props.restaurant && props.restaurant.menu){
       props.getProductByUserId({
-        menu: props.restaurant.menu,
+        menu: props.restaurant.menu._id,
         restaurant: props.match.params.restaurantId,
         limit: 5000,
       });
+      localStorage.setItem("language", props.restaurant?.menu?.settings?.language);
     }
-    localStorage.setItem("tableNo" , props.match.params.tableNo) 
+    localStorage.setItem("tableNo" , props.match.params.tableNo);
+
   }, [props.restaurant]);
 
   useEffect(() => {
@@ -213,7 +215,7 @@ const Home = (props) => {
     <>
       <section data-select-name className="restaurant-header">
         <div className="restaurant-image">
-          <img height="160" src={BASE_URL + restaurant.coverImage} alt="" />
+          <img height="160" src={BASE_URL + restaurant.banner_url} alt="" />
           <div className="lang-select select_location">
             <select id="mounth" value={localStorage.getItem("language") || "en"}  onChange={(e) => props.setLanguage(e.target.value)}>
               <option value="en">EN</option>
@@ -229,7 +231,7 @@ const Home = (props) => {
                 width="75"
                 height="75"
                 src={
-                  BASE_URL + (restaurant.banner_url || restaurant.coverImage)
+                  BASE_URL + (restaurant.logo_url)
                 }
                 alt=""
               />

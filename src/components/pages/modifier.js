@@ -249,8 +249,8 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                   <p>{activeProduct.description}</p>
                 </div>
                 <div className="dis-topping">
-                  {modifier &&
-                    modifier.length &&
+                  {(modifier
+                    ) &&
                     modifier.map((itm) => (
                       <>
                         <h3>
@@ -303,7 +303,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                             </>
                           ) : (
                             <>
-                              {itm.modifiers &&
+                              {(itm.modifiers && itm.modifiers.length) &&
                                 itm.modifiers.map((it) => (
                                   <li>
                                     <p>{it.name}</p>
