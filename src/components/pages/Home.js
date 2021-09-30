@@ -66,8 +66,26 @@ const Home = (props) => {
 
   const handleCartAdd = (itm) => {
       setModifiers(itm.modifierGroup);
+      if(itm.modifierGroup.length){
+        
+        setModifiers(itm.modifierGroup.map((itm) => ({
+          id: itm?.id?.id,
+          isRequired: itm?.id?.isRequired,
+          max: itm?.id.max,
+          min: itm?.id.min,
+          modifiers: itm.modifiers,
+          name: itm?.id.name,
+          nameAr: itm?.id.nameAr,
+          restaurant: itm?.id.restaurant,
+          status: itm?.id.status          
+        })))
+      } else{
+        setModifiers([])
+
+      }
       setActiveProduct(itm);
-    
+
+
 
     // let field = cart[itm.id] || {};
     // if (!field.qty) {
@@ -84,6 +102,8 @@ const Home = (props) => {
   };
 
   const handleCartAddCb = (product, id) => {
+
+      console.log(product)
       setCart((crt) => ({ ...crt, [id] :product }));
       setActiveProduct(false);
       setModifiers([]);
@@ -135,7 +155,6 @@ const Home = (props) => {
     }
     setActive(id);
   };
-  console.log(cart);
   if (props.product_detail_loading || props.product_list_loading) {
     return <Shimmer />;
   }
@@ -149,7 +168,6 @@ const Home = (props) => {
     //     price += cart[itm].qty * parseInt(cart[itm].price);
     //   }
     // });
-    console.log(price);
     return price > 0 ? (
       <div className="view-cart order-btn">
         <div className="container-fluid">
@@ -199,7 +217,6 @@ const Home = (props) => {
           temp += cart[itm][item].price * cart[itm][item].qty;
           if(cart[itm][item].modifiers){
             Object.keys(cart[itm][item].modifiers).map(data => {
-              console.log(cart[itm][item].modifiers[data], data)
               cart[itm][item].modifiers[data].map(dta => {
                 temp += dta.price * cart[itm][item].qty
               }) 

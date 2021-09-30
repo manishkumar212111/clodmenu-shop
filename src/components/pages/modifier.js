@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../API/config";
 
-const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alreadyInCart}) => {
-  console.log(activeProduct)
+const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alreadyInCart = {}}) => {
   const [selectedModifiers, setSelectedModifier] = useState({});
-  const [finalProduct, setProduct] = useState(alreadyInCart || {});
+  const [finalProduct, setProduct] = useState({});
   const [activeItem , setActiveItem] = useState({
       
   });
@@ -33,7 +32,6 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
     }
   }, [selectedModifiers])
   const handleRadioClick = (itm, mainItem) => {
-    console.log(itm);
     setSelectedModifier((fld) => ({
       ...fld,
       [mainItem.name]: [
@@ -47,17 +45,17 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
 
   useEffect(() => {
     console.log(alreadyInCart)
-    setProduct(alreadyInCart);
+    setProduct({});
   }, [alreadyInCart])
+
   const handleCheckBoxClick = (itm, mainItem) => {
-    console.log(itm);
     let temp = 0;
     let field = selectedModifiers[mainItem.name] || [];
+    console.log(itm , mainItem, field)
     if (field && field.length) {
       let h = [];
       field.map((it, index) => {
         if (it.title == itm.name) {
-          console.log("deleted field");
           temp = 1;
         } else {
           h.push(it);
@@ -80,6 +78,17 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
         price: itm.price,
       });
     }
+
+    if(mainItem.isRequired){
+      if((mainItem.min > field.length) || (mainItem.max < field.length)){
+        return;
+      }
+    } else {
+      if((mainItem.max < field.length)){
+        return;
+      }
+    }
+
     setSelectedModifier((fld) => ({
       ...fld,
       [mainItem.name]: field,
@@ -89,22 +98,30 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
   useEffect(() => {
     setSelectedModifier({});
   }, [activeProduct, modifier, handleClose]);
+  
   useEffect(() => {
     let field = {};
     modifier &&
       modifier.map((itm) => {
+        let count = itm.min;
         if (itm.isRequired) {
-          if (itm.modifiers && itm.modifiers.length) {
-            field = {
-              ...field,
-              [itm.name]: [
-                { title: itm.modifiers[0].name, price: itm.modifiers[0].price },
-              ],
-            };
-          }
+          let h = [];
+          itm.modifiers.map((item , idx) => {
+            console.log(count , h)
+            if (count > 0) {
+              h = field[itm.name] || [];
+              h.push({ title: item.name, price: item.price })
+                field = {
+                ...field,
+                [itm.name]: h
+              };
+              count = count-1;
+            }
+          })
+          
         }
       });
-
+      console.log(field)
     setSelectedModifier(field);
   }, [modifier]);
 
@@ -152,54 +169,32 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
     if(finalProduct[currentActiveItem]){
       newItem = { [currentActiveItem] : {...activeItem[currentActiveItem], qty: finalProduct[currentActiveItem].qty + 1 }}
     }
-    console.log(newItem, currentActiveItem)
 
     setProduct((product) => ({...product, 
       ...newItem
     }));
-    // console.log("dsvjbjb");
-    // const tempName = getSelectedModifiersName(selectedModifiers);
-    // setProduct((product) => ({
-    //   ...product,
-    //   [activeProduct.id + tempName]: {
-    //     qty:
-    //       product[activeProduct.id + tempName] &&
-    //       product[activeProduct.id + tempName]["qty"]
-    //         ? product[activeProduct.id + tempName]["qty"] + 1
-    //         : 1,
-    //     title: activeProduct.title,
-    //     price: activeProduct.sellingPrice,
-    //     modifiers: selectedModifiers,
-    //   },
-    // }));
   };
 
-  console.log(selectedModifiers);
-  console.log(finalProduct);
-
+  
   const getProductCount = () => {
     let obj = {
       count: 0,
       price: 0,
     };
-    console.log(finalProduct[Object.keys(activeItem)[0]])
     if(Object.keys(activeItem)[0]){
       let newFinalProduct = {...finalProduct, ...{[Object.keys(activeItem)[0]] : finalProduct[Object.keys(activeItem)[0]] ? { ...finalProduct[Object.keys(activeItem)[0]] , qty : finalProduct[Object.keys(activeItem)[0]].qty + 1} :  activeItem[Object.keys(activeItem)[0]] }};
 
-      console.log(newFinalProduct);
       newFinalProduct &&
         Object.keys(newFinalProduct).map((itm) => {
           obj.count += parseInt(newFinalProduct[itm].qty);
           obj.price += parseInt(newFinalProduct[itm].price) * parseInt(newFinalProduct[itm].qty);
           Object.keys(newFinalProduct[itm].modifiers).map(dta => {
-            console.log(newFinalProduct[itm].modifiers , dta)
             let temp = 0;
             newFinalProduct[itm].modifiers[dta].map(it => {temp += parseInt(it.price)});
              obj.price += temp * parseInt(newFinalProduct[itm].qty);
           })
         });
       
-        console.log(newFinalProduct, obj)
    
     }
     return obj;
@@ -211,15 +206,30 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
     if(finalProduct[currentActiveItem]){
       newItem = { [currentActiveItem] : {...activeItem[currentActiveItem], qty: finalProduct[currentActiveItem].qty + 1 }}
     }
-    console.log(newItem, currentActiveItem)
+    console.log(alreadyInCart); 
+    const currentFinalProduct = {...finalProduct , ...newItem};
+    let obj = {};
+    if(Object.keys({...alreadyInCart, ...currentFinalProduct}).length){
+      Object.keys({...alreadyInCart, ...currentFinalProduct}).map(itm => {
+        if(currentFinalProduct[itm] && alreadyInCart[itm]){
+          obj[itm] =  {...alreadyInCart[itm], qty : (alreadyInCart[itm].qty || 0) + currentFinalProduct[itm].qty};
 
-    handleCartAdd({...finalProduct , ...newItem}, activeProduct.id)
+        } else if(currentFinalProduct[itm]){
+          obj[itm] =  currentFinalProduct[itm];
+        } else{
+          obj[itm] =  alreadyInCart[itm];
+        }
+      })
+    }
+
+    handleCartAdd(obj, activeProduct.id)
 
   };
 
   if(!activeProduct){
     return null;
   }
+  console.log(modifier)
   return (
     <>
       <div
@@ -263,8 +273,11 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                             {itm.isRequired ? "Required" : "Optional"}
                           </span>
                         </h3>
+                        {itm.max > 1 ? <>
+                        <span className="required">  Select Upto {itm.max}</span>
+                        </> : <></>}
                         <ul>
-                          {itm.max > 0 ? (
+                          {/* {itm.max > 0 ? (
                             <>
                               {itm.modifiers &&
                                 itm.modifiers.map((it) => (
@@ -301,8 +314,8 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                                   </li>
                                 ))}
                             </>
-                          ) : (
-                            <>
+                          ) : ( */}
+                          {(<>
                               {(itm.modifiers && itm.modifiers.length) &&
                                 itm.modifiers.map((it) => (
                                   <li>
