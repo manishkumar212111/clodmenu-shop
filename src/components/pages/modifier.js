@@ -385,8 +385,8 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                     +
                   </div>
                 </div>
-                <a className="add-item-close" href="javascript:void(0)">
-                <h5 onClick={() => (getProductCount().count ? handleAddItem(): () => {} )}>ADD ITEM</h5>
+                <a onClick={() => (getProductCount().count ? handleAddItem(): () => {} )} className="add-item-close" href="javascript:void(0)">
+                <h5> ADD ITEM</h5>
                   <p>
                     Total <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getProductCount().price}</span>
                   </p>
