@@ -85,6 +85,7 @@ const Home = (props) => {
       }
       setActiveProduct(itm);
 
+      document.body.style.overflow = "hidden"
 
 
     // let field = cart[itm.id] || {};
@@ -107,6 +108,7 @@ const Home = (props) => {
       setCart((crt) => ({ ...crt, [id] :product }));
       setActiveProduct(false);
       setModifiers([]);
+      document.body.style.overflow = ""
       
       setTimeout(() => {
         localStorage.setItem("cart", JSON.stringify({ ...cart, [id] :product }));
@@ -332,7 +334,13 @@ const Home = (props) => {
       <Modifier 
         modifier={modifier}
         activeProduct={activeProduct}
-        handleClose={() => {setActiveProduct(""); setModifiers("")}}
+        handleClose={() => {
+         setActiveProduct("");
+         setModifiers("")
+         document.body.style.overflow = ""
+        }
+        
+        }
         handleCartAdd={handleCartAddCb}
         alreadyInCart = { cart[activeProduct.id] ? cart[activeProduct.id] : {}}
       />                      

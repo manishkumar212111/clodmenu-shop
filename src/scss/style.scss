@@ -363,7 +363,7 @@ input#number1 {
   background-color: #DA3643;
   padding: 15px 30px;
   border-radius: 60px;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 .order-btn a p {
   margin-bottom: 0;
@@ -501,6 +501,8 @@ img.right-icon {
 }
 .lang-select select {
   border: none;
+  padding: 10px 12px;
+  border-radius: 15px;
 }
 
 /* =========== */
@@ -582,6 +584,7 @@ img.right-icon {
 
 .restaurant-image img {
   width: 100%;
+  object-fit: cover;
 }
 .restaurant-details {
   background-color: #ffffff;
@@ -597,6 +600,9 @@ img.right-icon {
   background-color: #ffffff;
   border-radius: 100%;
   padding: 5px;
+  height: 75px;
+  width: 75px;
+  object-fit: cover;
 }
 .rest-name {
   position: relative;
@@ -712,6 +718,7 @@ img.right-icon {
   width: 85px;
   margin-bottom: 15px;
   height: 60px;
+  object-fit: cover;
 }
 .add-dish div {
   display: block;
@@ -750,5 +757,5 @@ img.right-icon {
   border-radius: 20px;
 }
 .view-cart.order-btn a p {
-  align-items: end;
+  align-items: baseline;
 }

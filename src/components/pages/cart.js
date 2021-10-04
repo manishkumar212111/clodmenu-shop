@@ -187,7 +187,7 @@ const Cart = (props) => {
 
   if (props?.orderDetail?.id) {
     return (
-      <section class="app-body" style={{backgroundColor: "white"}}>
+      <section class="app-body">
         <header>
           <div class="container-fluid d-flex">
             <h4>Order on the way</h4>

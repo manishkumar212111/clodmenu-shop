@@ -116,6 +116,8 @@ div#close i {
 }
 .popup-banner img {
     width: 100%;
+    object-fit: cover;
+    height: 180px;
 }
 .pop-dish-name {
     margin-top: 0;
@@ -144,7 +146,7 @@ div#close i {
     font-weight: 500;
 }
 .dis-topping h3 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     display: flex;
     justify-content: space-between;
@@ -157,6 +159,11 @@ div#close i {
     background-color: #FFD25F;
     padding: 5px 10px;
     border-radius: 30px;
+}
+.dis-topping > span.required {
+    color: #f00;
+    font-size: 12px;
+    font-weight: 400;
 }
 .dis-topping h3 span.optional {
     font-size: 11px;
