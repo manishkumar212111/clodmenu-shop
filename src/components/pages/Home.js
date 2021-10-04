@@ -23,6 +23,7 @@ const Home = (props) => {
   const [modifier, setModifiers] = useState(false);
   const [activeProduct, setActiveProduct] = useState(false);
   const [language, setLanguage] = useState("en");
+  const [langSelect, setLangSelect] = useState(false);
   useEffect(() => {
     props.getRestaurantById(props.match.params.restaurantId);
   }, [props.getRestaurantById]);
@@ -236,10 +237,21 @@ const Home = (props) => {
         <div className="restaurant-image">
           <img height="160" src={BASE_URL + restaurant.banner_url} alt="" />
           <div className="lang-select select_location">
-            <select id="mounth" value={localStorage.getItem("language") || "en"}  onChange={(e) => props.setLanguage(e.target.value)}>
+          <div class="lang-select select_location">
+            <div class="select">
+              <select id="mounth" class="select-hidden">
+                <option value="en">EN</option>
+                <option value="ar">AR</option>
+              </select>
+            <div class={`select-styled ${langSelect?  "active" : ""}`} onClick={() => setLangSelect(!langSelect)}>{localStorage.getItem("language") == "en" ? "EN" : "AR"}</div>
+            <ul class="select-options" style={{display: langSelect ? "" : "none"}}>
+              <li onClick={(e) =>{props.setLanguage("en"); setLangSelect(false)}}>EN</li>
+              <li onClick={(e) =>{props.setLanguage("ar"); setLangSelect(false)}}>AR</li></ul></div>
+          </div>
+            {/* <select id="mounth" value={localStorage.getItem("language") || "en"}  onChange={(e) => props.setLanguage(e.target.value)}>
               <option value="en">EN</option>
               <option value="ar">AR</option>
-            </select>
+            </select> */}
           </div>
         </div>
         <div className="restaurant-details">
