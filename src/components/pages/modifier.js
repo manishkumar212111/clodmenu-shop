@@ -51,7 +51,6 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
   const handleCheckBoxClick = (itm, mainItem) => {
     let temp = 0;
     let field = selectedModifiers[mainItem.name] || [];
-    console.log(itm , mainItem, field)
     if (field && field.length) {
       let h = [];
       field.map((it, index) => {
@@ -277,7 +276,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                         <span className="required">  Select Upto {itm.max}</span>
                         </> : <></>}
                         <ul>
-                          {/* {itm.max > 0 ? (
+                          { (itm.isRequired && itm.min == 1 && itm.max == 1) ? (
                             <>
                               {itm.modifiers &&
                                 itm.modifiers.map((it) => (
@@ -314,8 +313,8 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                                   </li>
                                 ))}
                             </>
-                          ) : ( */}
-                          {(<>
+                          ) : 
+                          <>
                               {(itm.modifiers && itm.modifiers.length) &&
                                 itm.modifiers.map((it) => (
                                   <li>
@@ -351,7 +350,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                                   </li>
                                 ))}
                             </>
-                          )}
+                            }
                         </ul>
                       </>
                     ))}

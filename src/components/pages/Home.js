@@ -29,6 +29,13 @@ const Home = (props) => {
   }, [props.getRestaurantById]);
 
   useEffect(() => {
+
+    if(props?.match?.params?.clientId && (props?.match?.params?.clientId != localStorage.getItem("clientId"))){
+      localStorage.setItem("clientId" , props?.match?.params?.clientId);
+      localStorage.setItem("cart", JSON.stringify({}));
+    }
+  }, [props?.match?.params?.clientId])
+  useEffect(() => {
     setRestaurant(props.restaurant);
     if(props.restaurant && props.restaurant.menu){
       props.getProductByUserId({

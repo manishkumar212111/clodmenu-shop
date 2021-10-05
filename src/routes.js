@@ -15,7 +15,7 @@ const Route = [
         exact: true,
     },
     {
-        path: "/:restaurantId/:tableNo",
+        path: "/:restaurantId/:clientId/:tableNo",
         component: Home,
         exact: true,
     },
