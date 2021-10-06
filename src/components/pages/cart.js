@@ -133,6 +133,14 @@ const Cart = (props) => {
       return temp;
     }
   };
+
+  const calculateTax = () => {
+    let price = getPriceCountInCart();
+    if(restaurant.taxStatus){
+      return ((parseFloat(restaurant.taxRate || 15) / 100) * price).toFixed(2)
+    }
+    return 0;
+  }
   console.log(props);
   const handleCreateOrder = () => {
     if(!(paymentObj && paymentObj.type)){
@@ -149,8 +157,8 @@ const Cart = (props) => {
         ? JSON.parse(localStorage.getItem("restaurant")).id
         : "",
       subTotalAmount: getPriceCountInCart(),
-      tax: 0,
-      totalAmount: getPriceCountInCart(),
+      tax: calculateTax(),
+      totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()),
       paymentType: paymentObj.type,
       paymentStatus:
         paymentObj.type == "cash" || paymentObj.type == "mada"
@@ -604,11 +612,11 @@ const Cart = (props) => {
             </div>
             <div className="total">
               <p>Sales Tax</p>
-              <p className="price-total">$3.00</p>
+              <p className="price-total">SR {calculateTax()}</p>
             </div>
             <div className="total all-total">
               <p>Total</p>
-              <p><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span>{getPriceCountInCart()}</p>
+              <p><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())}</p>
             </div>
           </div>
         </div>
@@ -619,7 +627,7 @@ const Cart = (props) => {
           <div className="container-fluid" onClick={handleCreateOrder}>
             <a>
               <p>
-                Total <span>SR {getPriceCountInCart()}</span>
+                Total <span>SR {parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())}</span>
               </p>
               <h5>
                 place order <i className="bx bx-chevron-right"></i>
