@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { create } from "../../actions/order";
 import { connect } from "react-redux";
-
+import {t } from "../language";
 const Cart = (props) => {
   const [cart, setCart] = useState({});
   const [showPayment, setShowPayment] = useState(false);
@@ -171,7 +171,7 @@ const Cart = (props) => {
       <section class="app-body">
         <header>
           <div class="container-fluid d-flex">
-            <h4>Order</h4>
+            <h4>{t("Order")}</h4>
           </div>
         </header>
 
@@ -185,7 +185,7 @@ const Cart = (props) => {
                 }
                 alt=""
               /> */}
-              <p>Creating order, Please wait</p>
+              <p>{t("Creating order, Please wait")}</p>
             </div>
           </div>
         </div>
@@ -198,7 +198,7 @@ const Cart = (props) => {
       <section class="app-body">
         <header>
           <div class="container-fluid d-flex">
-            <h4>Order on the way</h4>
+            <h4>{t("Order on the way")}</h4>
           </div>
         </header>
 
@@ -213,18 +213,18 @@ const Cart = (props) => {
                 alt=""
               />
               <p className="mt-5">
-                We have start preparing your order, it will be served you soon
+                {t("We have start preparing your order, it will be served you soon")}
               </p>
-              <h3>Order Number - {props?.orderDetail?.orderNo}</h3>
+              <h3>{t("Order Number")} - {props?.orderDetail?.orderNo}</h3>
             </div>
           </div>
         </div>
 
         <div class="order-btn">
           <div class="container-fluid">
-            <h4>Missed Something ?</h4>
+            <h4>{t("Missed Something ?")}</h4>
             <a onClick={() => window.history.go(-1)}>
-              <h6>Order More</h6>
+              <h6>{t("Order More")}</h6>
             </a>
           </div>
         </div>
@@ -240,13 +240,13 @@ const Cart = (props) => {
             <span onClick={() => window.history.go(-1)}>
               <i className="bx bx-chevron-left"></i>
             </span>
-            <h4>Your Cart ({getTotalProductCount()})</h4>
+            <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
           </div>
         </header>
         <div className="browser-main">
           <div className="cart-area">
             <div className="container-fluid">
-              <p style={{ textAlign: "center" }}>Your cart is empty</p>
+              <p style={{ textAlign: "center" }}>{t("Your cart is empty")}</p>
             </div>
           </div>
         </div>
@@ -263,7 +263,7 @@ const Cart = (props) => {
             <span onClick={() => setShowPayment(false)}>
               <i className="bx bx-chevron-left"></i>
             </span>
-            <h4>payments</h4>
+            <h4>{t("payments")}</h4>
           </div>
         </header>
 
@@ -271,7 +271,7 @@ const Cart = (props) => {
           <div className="payment-method">
             <div className="container-fluid">
               <div className="pay-method">
-                <h4>Payment method</h4>
+                <h4>{t("Payment method")}</h4>
                 <ul className="payment-option">
                   {restaurant?.menu?.settings?.payment.cash && <li
                     onClick={() =>
@@ -279,7 +279,7 @@ const Cart = (props) => {
                     }
                   >
                     <a className={paymentObj.type == "cash" ? "active" : ""}>
-                      <i className="bx bx-wallet"></i> Pay Cash
+                      <i className="bx bx-wallet"></i> {("Pay Cash")}
                     </a>
                   </li>}
                   {restaurant?.menu?.settings?.payment.creditCard && <li
@@ -288,7 +288,7 @@ const Cart = (props) => {
                     }
                   >
                     <a className={paymentObj.type == "card" ? "active" : ""}>
-                      <i className="bx bx-credit-card-alt"></i> Pay Via Card
+                      <i className="bx bx-credit-card-alt"></i> {("Pay Via Card")}
                     </a>
                   </li>}
                   {restaurant?.menu?.settings?.payment.mada && <li
@@ -305,7 +305,7 @@ const Cart = (props) => {
                           alt=""
                         />
                       </i>{" "}
-                      MADA
+                      {t("MADA")}
                     </a>
                   </li>}
                 </ul>
@@ -419,7 +419,7 @@ const Cart = (props) => {
                     }
                     alt=""
                   />
-                  <p>Great we will accept your payment after serving you.</p>
+                  <p>{("Great we will accept your payment after serving you.")}</p>
                 </div>
               )}
             </div>
@@ -429,7 +429,7 @@ const Cart = (props) => {
         <div className="order-btn">
           <div className="container-fluid">
             <a onClick={() => {paymentObj.type && setShowPayment(false)}}>
-              <h6>{paymentObj.type == "card" ? "use this card" : "Select"}</h6>
+              <h6>{paymentObj.type == "card" ? t("use this card") : t("Select")}</h6>
             </a>
           </div>
         </div>
@@ -444,7 +444,7 @@ const Cart = (props) => {
           <span onClick={() => window.history.go(-1)}>
             <i className="bx bx-chevron-left"></i>
           </span>
-          <h4>Your Cart ({getTotalProductCount()})</h4>
+          <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
         </div>
       </header>
       <div className="browser-main">
@@ -459,14 +459,14 @@ const Cart = (props) => {
                         <p>{cart[itm][item].qty}X</p>
                       </div>
                       <div className="dish-name">
-                        <h5>{cart[itm][item].title}</h5>
+                        <h5>{localStorage.getItem("language") =="en" ?  cart[itm][item].title : cart[itm][item].titleAr}</h5>
                         <p>
                           {cart[itm][item].modifiers &&
                             Object.keys(cart[itm][item].modifiers)
                               .map((data) => {
                                 let temp = [];
                                 temp = cart[itm][item].modifiers[data]
-                                  .map((dta) => dta.title)
+                                  .map((dta) => localStorage.getItem("language") =="en" ? dta.title : dta.titleAr)
                                   .join(",");
                                 return temp;
                               })
@@ -492,7 +492,7 @@ const Cart = (props) => {
         <div className="select-payment">
           <div className="container-fluid">
             <a onClick={() => setShowPayment(true)}>
-              <h6>Payment Option</h6>
+              <h6>{t("Payment Option")}</h6>
               <p>
                 {/* <img
                   src={
@@ -512,8 +512,8 @@ const Cart = (props) => {
                         : ""
                     }`
                   : paymentObj.type == "mada"
-                  ? "Mada"
-                  : paymentObj.type === "cash" ? "Cash" : "Select"}
+                  ? t("Mada")
+                  : paymentObj.type === "cash" ? t("Cash") : t("Select")}
                 <i className="bx bx-chevron-right"></i>
               </p>
             </a>
@@ -523,10 +523,10 @@ const Cart = (props) => {
         <div className="order-instruction">
           <div className="container-fluid">
             <div className="instruction">
-              <h5>Order Instructions</h5>
+              <h5>{t("Order Instructions")}</h5>
               <textarea
                 name=""
-                placeholder="Ex - Do not put bell pepper in pizza, serve beer chilled"
+                placeholder={t("Ex - Do not put bell pepper in pizza, serve beer chilled")}
                 id=""
                 value={orderObj.orderNote}
                 cols="30"
@@ -556,12 +556,12 @@ const Cart = (props) => {
                         src="https://ik.imagekit.io/lcq5etn9k/restro/order-table_VebSza4hO.png"
                         alt=""
                       />{" "}
-                      Order Serve At
+                      {t("Order Serve At")}
                     </label>
                   </div>
                   {localStorage.getItem("tableNo") && (
                     <p>
-                      Table{" "}
+                      {t("Table")}{" "}
                       {localStorage.getItem("tableNo") !== "undefined"
                         ? localStorage.getItem("tableNo")
                         : ""}
@@ -595,7 +595,7 @@ const Cart = (props) => {
                         src="https://ik.imagekit.io/lcq5etn9k/restro/take-away_JcWi5wpzBM.png"
                         alt=""
                       />{" "}
-                      Take Away
+                      {t("Take Away")}
                     </label>
                   </div>
                 </li>}
@@ -607,15 +607,15 @@ const Cart = (props) => {
         <div className="total-amount">
           <div className="container-fluid">
             <div className="total">
-              <p>Item Total</p>
+              <p>{t("Item Total")}</p>
               <p className="price-total"><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getPriceCountInCart()}</p>
             </div>
             <div className="total">
-              <p>Sales Tax</p>
+              <p>{t("Sales Tax")}</p>
               <p className="price-total">SR {calculateTax()}</p>
             </div>
             <div className="total all-total">
-              <p>Total</p>
+              <p>{t("Total")}</p>
               <p><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())}</p>
             </div>
           </div>
@@ -627,10 +627,10 @@ const Cart = (props) => {
           <div className="container-fluid" onClick={handleCreateOrder}>
             <a>
               <p>
-                Total <span>SR {parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())}</span>
+                {t("Total")} <span>SR {parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())}</span>
               </p>
               <h5>
-                place order <i className="bx bx-chevron-right"></i>
+                {t("Place Order")} <i className="bx bx-chevron-right"></i>
               </h5>
             </a>
           </div>

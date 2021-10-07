@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../API/config";
-
+import { t } from "../language";
 const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alreadyInCart = {}}) => {
   const [selectedModifiers, setSelectedModifier] = useState({});
   const [finalProduct, setProduct] = useState({});
@@ -13,6 +13,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
       [activeProduct.id] : {
         qty: 1,
         title: activeProduct.title,
+        titleAr: activeProduct.titleAr,
         price: activeProduct.sellingPrice,
         modifiers: [],
       }
@@ -24,6 +25,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
       setActiveItem({
         [activeProduct.id + tempName] : {
           qty: 1,
+          titleAr: activeProduct.titleAr,
           title: activeProduct.title,
           price: activeProduct.sellingPrice,
           modifiers: selectedModifiers,
@@ -37,6 +39,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
       [mainItem.name]: [
         {
           title: itm.name,
+          titleAr: itm.nameAr,
           price: itm.price,
         },
       ],
@@ -65,6 +68,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
       field = [
         {
           title: itm.name,
+          titleAr: itm.nameAr,
           price: itm.price,
         },
       ];
@@ -73,7 +77,8 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
 
     if (temp == 0) {
       field.push({
-        title: itm.name,
+          titleAr: itm.nameAr,
+          title: itm.name,
         price: itm.price,
       });
     }
@@ -109,7 +114,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
             console.log(count , h)
             if (count > 0) {
               h = field[itm.name] || [];
-              h.push({ title: item.name, price: item.price })
+              h.push({ title: item.name,titleAr: item.nameAr, price: item.price })
                 field = {
                 ...field,
                 [itm.name]: h
@@ -145,6 +150,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
       [tempName]: {
         qty: count,
         title: activeProduct.title,
+        titleAr: activeProduct.titleAr,
         price: activeProduct.sellingPrice,
         modifiers: selectedModifiers,
       },
@@ -251,11 +257,11 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
               </div>
               <div className="container-fluid">
                 <div className="pop-dish-name">
-                  <h4>{activeProduct.title}</h4>
-                  <h5>Calorie: {activeProduct.calorie}</h5>
+                  <h4>{localStorage.getItem("language") == "en" ? activeProduct.title : activeProduct.titleAr}</h4>
+                  <h5>{t("Calorie")}: {activeProduct.calorie}</h5>
                 </div>
                 <div className="dish-desc">
-                  <p>{activeProduct.description}</p>
+                  <p>{localStorage.getItem("language") == "en" ? activeProduct.description : activeProduct.descriptionAr}</p>
                 </div>
                 <div className="dis-topping">
                   {(modifier
@@ -273,7 +279,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                           </span>
                         </h3>
                         {itm.max > 1 ? <>
-                        <span className="required">  Select Upto {itm.max}</span>
+                        <span className="required">  {t("Select Upto")} {itm.max}</span>
                         </> : <></>}
                         <ul>
                           { (itm.isRequired && itm.min == 1 && itm.max == 1) ? (
@@ -281,7 +287,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                               {itm.modifiers &&
                                 itm.modifiers.map((it) => (
                                   <li>
-                                    <p>{it.name}</p>
+                                    <p>{localStorage.getItem("language") == "en" ? it.name : itm.nameAr }</p>
                                     <div className="radio-item">
                                       <span for="table-order">
                                         <span className="arabicRs">S<span className="arabicSmallRs">R</span></span>
@@ -318,7 +324,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                               {(itm.modifiers && itm.modifiers.length) &&
                                 itm.modifiers.map((it) => (
                                   <li>
-                                    <p>{it.name}</p>
+                                    <p>{localStorage.getItem("language") =="en" ?  it.name : it.nameAr}</p>
                                     <div className="checkbox-item">
                                       <span>
                                       <span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span>
@@ -385,9 +391,9 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                   </div>
                 </div>
                 <a onClick={() => (getProductCount().count ? handleAddItem(): () => {} )} className="add-item-close" href="javascript:void(0)">
-                <h5> ADD ITEM</h5>
+                <h5> {t("ADD ITEM")}</h5>
                   <p>
-                    Total <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getProductCount().price}</span>
+                    {t("Total")} <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getProductCount().price}</span>
                   </p>
                 </a>
               </div>

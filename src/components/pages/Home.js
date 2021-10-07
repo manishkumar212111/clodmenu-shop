@@ -8,7 +8,7 @@ import logo from "../../scss/img/rest-logo.png";
 import orderTable from "../../scss/img/order-table.png";
 import foodImg from "../../scss/img/food-img-1.png";
 import { setLanguage } from "../../actions/language";
-
+import { t } from "../language";
 import { connect } from "react-redux";
 import { BASE_URL } from "../../API/config";
 import Modifier from "./modifier";
@@ -43,7 +43,7 @@ const Home = (props) => {
         restaurant: props.match.params.restaurantId,
         limit: 5000,
       });
-      localStorage.setItem("language", props.restaurant?.menu?.settings?.language);
+      localStorage.setItem("language",localStorage.getItem("language") || props.restaurant?.menu?.settings?.language);
     }
     localStorage.setItem("tableNo" , props.match.params.tableNo);
 
@@ -183,10 +183,10 @@ const Home = (props) => {
         <div className="container-fluid">
           <a href="/cart">
             <p>
-              {getTotalProductCount()} items in cart <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {price}</span>
+              {getTotalProductCount()} {t("items in cart")} <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {price}</span>
             </p>
             <h5>
-              view cart <i className="bx bx-chevron-right"></i>
+              {t("view cart")} <i className="bx bx-chevron-right"></i>
             </h5>
           </a>
         </div>
@@ -275,11 +275,11 @@ const Home = (props) => {
               />
             </div>
             <div className="rest-name">
-              <h4>{restaurant?.name}</h4>
+              <h4>{localStorage.getItem("language") =="en" ? restaurant?.name : restaurant?.nameAr}</h4>
               <div className="rest-contact">
                 <div className="contact-item">
                   <p>
-                    <img src={orderTable} alt="" /> Table{" "}
+                    <img src={orderTable} alt="" /> {t("Table")}{" "}
                     {tableNo ? tableNo : ""}
                   </p>
                 </div>
@@ -291,7 +291,7 @@ const Home = (props) => {
 
       <section className="menu-wrapper">
         <div className="container-fluid">
-          <h3>MENU</h3>
+          <h3>{t("MENU")}</h3>
           <nav className="navigation" id="mainNav">
             {Object.keys(products).map((itm, index) => (
               <span
@@ -309,8 +309,8 @@ const Home = (props) => {
                   products[item].map((itm, index) => (
                     <li>
                       <div className="dish-name">
-                        <h4>{itm.title}</h4>
-                        <p className="more">{itm.description}</p>
+                        <h4>{localStorage.getItem("language") == "en" ? itm.title : itm.titleAr}</h4>
+                        <p className="more">{localStorage.getItem("language") == "en" ? itm.description : itm.descriptionAr}</p>
                         <h5><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {itm.sellingPrice}</h5>
                       </div>
                       <div className="dish-img">
@@ -326,7 +326,7 @@ const Home = (props) => {
                             className="button"
                             onClick={() => handleCartAdd(itm)}
                           >
-                            ADD
+                            {t("ADD")}
                           </div>
                             <>
                               {getProductCountInCart(itm.id) ? <span>{getProductCountInCart(itm.id)}</span> : ""}

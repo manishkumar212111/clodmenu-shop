@@ -14,6 +14,7 @@ class Layout extends React.Component {
         super();
         this.state = {
             title: "Welcome to Resume Maker!",
+            language: localStorage.getItem("language")
         };
         this.handleScroll = this.handleScroll.bind(this);
     }
@@ -47,6 +48,9 @@ class Layout extends React.Component {
           default:
         }
       }
+    componentWillReceiveProps(props, nextProps) {
+      this.setState({language : nextProps.language})
+    }
 
     componentDidUpdate(){
         let alerts = this.props.alerts || [];
@@ -72,7 +76,7 @@ class Layout extends React.Component {
     render() {
 
         return (
-            <div>
+            <div dir={this.props.language !== "en" ? "rtl" : "ltr"}>
                 <ToastContainer 
                     position="top-right"
                     autoClose={5000}
@@ -103,6 +107,7 @@ class Layout extends React.Component {
 
 const mapStateToProps = state => ({
     alerts: state.alert,
+    language: state.language.language
   });
   
 export default connect( mapStateToProps )( Layout );
