@@ -49,7 +49,7 @@ class Layout extends React.Component {
         }
       }
     componentWillReceiveProps(props, nextProps) {
-      this.setState({language : nextProps.language})
+      this.setState({language : props.language})
     }
 
     componentDidUpdate(){
@@ -72,11 +72,11 @@ class Layout extends React.Component {
       }
 
     }
-
     render() {
+      console.log(this.state);
 
         return (
-            <div dir={this.props.language !== "en" ? "rtl" : "ltr"}>
+            <div dir={this.state.language == "en" ? "ltr" : "rtl"}>
                 <ToastContainer 
                     position="top-right"
                     autoClose={5000}
