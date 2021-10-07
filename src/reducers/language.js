@@ -1,6 +1,6 @@
 
 const initialState = {
-    language : "en"
+    language : ""
   };
   
   export default function(state = initialState, action) {

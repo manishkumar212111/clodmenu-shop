@@ -10,8 +10,8 @@ import Footer from "./Footer";
 
 
 class Layout extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             title: "Welcome to Resume Maker!",
             language: localStorage.getItem("language")
@@ -48,8 +48,9 @@ class Layout extends React.Component {
           default:
         }
       }
-    componentWillReceiveProps(props, nextProps) {
-      this.setState({language : props.language})
+    componentWillReceiveProps(nextProps) {
+      console.log(nextProps)
+      this.setState({language : nextProps.language})
     }
 
     componentDidUpdate(){
@@ -73,10 +74,10 @@ class Layout extends React.Component {
 
     }
     render() {
-      console.log(this.state);
+      console.log(this.state, this.props);
 
         return (
-            <div dir={this.state.language == "en" ? "ltr" : "rtl"}>
+            <div id="mainDir">
                 <ToastContainer 
                     position="top-right"
                     autoClose={5000}

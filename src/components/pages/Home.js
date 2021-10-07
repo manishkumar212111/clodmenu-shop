@@ -44,13 +44,17 @@ const Home = (props) => {
         limit: 5000,
       });
       localStorage.setItem("language",localStorage.getItem("language") || props.restaurant?.menu?.settings?.language);
+      setLanguage(localStorage.getItem("language") || props.restaurant?.menu?.settings?.language);
+    
     }
     localStorage.setItem("tableNo" , props.match.params.tableNo);
 
   }, [props.restaurant]);
 
   useEffect(() => {
-      setLanguage(localStorage.getItem("language") | 'en')  
+    console.log("In language change")
+      setLanguage(localStorage.getItem("language") | 'en');
+      document.getElementById("mainDir").dir = localStorage.getItem("language") == "en" ? "ltr" : "rtl";  
   }, [props.language]);
 
   useEffect(() => {
