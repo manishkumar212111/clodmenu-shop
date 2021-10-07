@@ -29,7 +29,7 @@ const Cart = (props) => {
   useEffect(() => {
     if (props?.orderDetail?.id) {
       setCart({});
-      localStorage.removeItem("cart");
+      localStorage.setItem("cart", JSON.stringify({}));
     }
   }, [props?.orderDetail?.id]);
 
