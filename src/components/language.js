@@ -31,7 +31,6 @@ const translate = {
     "Order Instructions": "Order Instructions",
     "Ex - Do not put bell pepper in pizza, serve beer chilled": "Ex - Do not put bell pepper in pizza, serve beer chilled",
     "Order Serve At": "Order Serve At",
-    "Table" : "Table",
     "Take Away" : "Take Away",
     "Item Total": "Item Total",
     "Sales Tax": "Sales Tax",
