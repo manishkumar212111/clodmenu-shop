@@ -63,7 +63,7 @@ const Home = (props) => {
       setActive(Object.keys(groupBy(props.productList))[0]);
       setCart(localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : {})
     }
-  }, [props.productList]);
+  }, [props.productList, props.language]);
 
   const handleScroll = (e) => {
     document.querySelectorAll("#menu-list ul").forEach(function (itm) {
