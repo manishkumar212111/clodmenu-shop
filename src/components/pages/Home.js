@@ -153,7 +153,7 @@ const Home = (props) => {
 
   const groupBy = function (xs, key) {
     return xs.reduce(function (rv, x) {
-      (rv[x.category?.name] = rv[x.category?.name] || []).push(x);
+      (rv[localStorage.getItem("language") == "en" ?  x.category?.name : x.category?.nameAr] = rv[localStorage.getItem("language") == "en" ?  x.category?.name : x.category?.nameAr] || []).push(x);
       return rv;
     }, {});
   };
