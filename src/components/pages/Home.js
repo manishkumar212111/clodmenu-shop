@@ -83,13 +83,13 @@ const Home = (props) => {
         setModifiers(itm.modifierGroup.map((itm) => ({
           id: itm?.id?.id,
           isRequired: itm?.id?.isRequired,
-          max: itm?.id.max,
-          min: itm?.id.min,
+          max: itm?.id?.max,
+          min: itm?.id?.min,
           modifiers: itm.modifiers,
-          name: itm?.id.name,
-          nameAr: itm?.id.nameAr,
-          restaurant: itm?.id.restaurant,
-          status: itm?.id.status          
+          name: itm?.id?.name,
+          nameAr: itm?.id?.nameAr,
+          restaurant: itm?.id?.restaurant,
+          status: itm?.id?.status          
         })))
       } else{
         setModifiers([])

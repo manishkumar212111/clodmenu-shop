@@ -275,7 +275,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                               itm.isRequired ? "required" : "optional"
                             }`}
                           >
-                            {itm.isRequired ? "Required" : "Optional"}
+                            {itm.isRequired ? t("Required") : t("Optional")}
                           </span>
                         </h3>
                         {itm.max > 1 ? <>
