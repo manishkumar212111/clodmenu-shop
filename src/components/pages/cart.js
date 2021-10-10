@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { create } from "../../actions/order";
 import { connect } from "react-redux";
 import {t } from "../language";
+import { createPayment } from "../../actions/payment";
 const Cart = (props) => {
   const [cart, setCart] = useState({});
+  const [checkoutDetail , setCheckoutDetail] = useState({});
   const [showPayment, setShowPayment] = useState(false);
   const [restaurant, setRestaurant] = useState(
     JSON.parse(localStorage.getItem("restaurant"))
@@ -166,6 +168,46 @@ const Cart = (props) => {
           : "pending",
     });
   };
+
+  const handleCashClick = () => {
+      var unloadWidget = function() {
+        if (window.wpwl !== undefined && window.wpwl.unload !== undefined) {
+            window.wpwl.unload();
+            // document.getElementsByTagName("script").map(function (itm) {
+            //     if (itm.src.indexOf('static.min.js') !== -1) {
+            //       itm.remove();
+            //     }
+            // });
+        }
+    };
+    // unloadWidget()
+    setTimeout(() => {
+      setPaymentObj((pto) => ({ ...pto, type: "cash" }))
+
+    }, 500)
+
+  }
+
+  useEffect(() => {
+    console.log(paymentObj)
+    if(showPayment && paymentObj.type=="card"){
+      props.createPayment({amount:100} , (res) => {
+        setCheckoutDetail(res);
+        console.log(res);
+        var tag = document.createElement('script');
+        tag.async = true;
+        tag.id="test-payment"
+        tag.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${res.id}`;
+        var body = document.getElementsByTagName('body')[0];
+        body.appendChild(tag);
+
+      })
+    } else {
+
+    }
+  }, [showPayment , paymentObj]);
+
+
   if (props.order_detail_loading) {
     return (
       <section class="app-body">
@@ -253,8 +295,7 @@ const Cart = (props) => {
       </section>
     );
   }
-
-  
+console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""} ${restaurant?.menu?.settings?.payment?.creditCard ? "VISA MASTER AMEX " : ""} ${restaurant?.menu?.settings?.payment?.mada ? "MADA" : ""}`)
   if (showPayment) {
     return (
       <section className="app-body">
@@ -275,7 +316,7 @@ const Cart = (props) => {
                 <ul className="payment-option">
                   {restaurant?.menu?.settings?.payment.cash && <li
                     onClick={() =>
-                      setPaymentObj((pto) => ({ ...pto, type: "cash" }))
+                      handleCashClick()
                     }
                   >
                     <a className={paymentObj.type == "cash" ? "active" : ""}>
@@ -291,7 +332,7 @@ const Cart = (props) => {
                       <i className="bx bx-credit-card-alt"></i> {("Pay Via Card")}
                     </a>
                   </li>}
-                  {restaurant?.menu?.settings?.payment.mada && <li
+                  {/* {restaurant?.menu?.settings?.payment.mada && <li
                     onClick={() =>
                       setPaymentObj((pto) => ({ ...pto, type: "mada" }))
                     }
@@ -307,108 +348,124 @@ const Cart = (props) => {
                       </i>{" "}
                       {t("MADA")}
                     </a>
-                  </li>}
+                  </li>} */}
                 </ul>
               </div>
+               <div style={{display: paymentObj.type == "card" ? "" : "none", marginTop: 10}}><form 
+                  id="my-payment-form"
+                  action="http://localhost:5000/api/payment/capture-payment"
+                  class="paymentWidgets"
+                  data-brands={`VISA MASTER AMEX ${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""} ${restaurant?.menu?.settings?.payment?.mada ? "MADA" : ""}`}
+                >
+                  <input type="hidden" value="Manish" name="teest" />
 
-              {paymentObj.type == "card" && (
-                <div className="card-fields">
-                  <div className="row">
-                    <div className="col-12 form-group">
-                      <label for="">Name on card</label>
-                      <input
-                        type="text"
-                        onChange={(e) =>
-                          setPaymentObj((pto) => ({
-                            ...pto,
-                            cardDetails: {
-                              ...pto.cardDetails,
-                              name: e.target.value,
-                            },
-                          }))
-                        }
-                      />
-                      <img
-                        src="assets/img/user.svg"
-                        className="left-icon field-icon"
-                        alt=""
-                      />
-                    </div>
-                    <div className="col-12 form-group">
-                      <label for="">Card number</label>
-                      <input
-                        id="cc"
-                        type="text"
-                        name="creditcard"
-                        placeholder="0123 4567 8901 4321"
-                        onChange={(e) =>
-                          setPaymentObj((pto) => ({
-                            ...pto,
-                            cardDetails: {
-                              ...pto.cardDetails,
-                              cardNumber: e.target.value,
-                            },
-                          }))
-                        }
-                      />
-                      <img
-                        src={
-                          "https://ik.imagekit.io/lcq5etn9k/restro/credit-card_E6bJFYg-CE.svg"
-                        }
-                        className="left-icon field-icon"
-                        alt=""
-                      />
-                      {/* <img src={"https://ik.imagekit.io/lcq5etn9k/restro/mc-symbol_Yi6-dNRmE_J.svg"} className="right-icon field-icon" alt="" /> */}
-                    </div>
-                    <div className="col-6 form-group">
-                      <label for="">Expiry Date</label>
-                      <input
-                        maxlength="5"
-                        placeholder="MM/YY"
-                        type="text"
-                        onChange={(e) =>
-                          setPaymentObj((pto) => ({
-                            ...pto,
-                            cardDetails: {
-                              ...pto.cardDetails,
-                              cardExpiry: e.target.value,
-                            },
-                          }))
-                        }
-                      />
-                      <img
-                        src={
-                          "https://ik.imagekit.io/lcq5etn9k/restro/calendar_Gr23OBS-Q2.svg"
-                        }
-                        className="left-icon field-icon"
-                        alt=""
-                      />
-                    </div>
-                    <div className="col-6 form-group">
-                      <label for="">CVV</label>
-                      <input
-                        maxlength="4"
-                        type="password"
-                        onChange={(e) =>
-                          setPaymentObj((pto) => ({
-                            ...pto,
-                            cardDetails: {
-                              ...pto.cardDetails,
-                              cvv: e.target.value,
-                            },
-                          }))
-                        }
-                      />
-                      <img
-                        src={
-                          "https://ik.imagekit.io/lcq5etn9k/restro/hint_nofsZ8__WxW.svg"
-                        }
-                        className="left-icon field-icon"
-                        alt=""
-                      />
-                    </div>
-                  </div>
+                </form>
                 </div>
+              {paymentObj.type == "card" && (
+                <form 
+                  // style={{display: "none"}}
+                  // id="my-payment-form"
+                  // action="https://wordpresshyperpay.docs.oppwa.com/tutorials/integration-guide"
+                  // class="paymentWidgets"
+                  // data-brands={`VISA MASTER AMEX ${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""} ${restaurant?.menu?.settings?.payment?.mada ? "MADA" : ""}`}
+                ></form>
+                // <div className="card-fields">
+                //   <div className="row">
+                //     <div className="col-12 form-group">
+                //       <label for="">Name on card</label>
+                //       <input
+                //         type="text"
+                //         onChange={(e) =>
+                //           setPaymentObj((pto) => ({
+                //             ...pto,
+                //             cardDetails: {
+                //               ...pto.cardDetails,
+                //               name: e.target.value,
+                //             },
+                //           }))
+                //         }
+                //       />
+                //       <img
+                //         src="assets/img/user.svg"
+                //         className="left-icon field-icon"
+                //         alt=""
+                //       />
+                //     </div>
+                //     <div className="col-12 form-group">
+                //       <label for="">Card number</label>
+                //       <input
+                //         id="cc"
+                //         type="text"
+                //         name="creditcard"
+                //         placeholder="0123 4567 8901 4321"
+                //         onChange={(e) =>
+                //           setPaymentObj((pto) => ({
+                //             ...pto,
+                //             cardDetails: {
+                //               ...pto.cardDetails,
+                //               cardNumber: e.target.value,
+                //             },
+                //           }))
+                //         }
+                //       />
+                //       <img
+                //         src={
+                //           "https://ik.imagekit.io/lcq5etn9k/restro/credit-card_E6bJFYg-CE.svg"
+                //         }
+                //         className="left-icon field-icon"
+                //         alt=""
+                //       />
+                //       {/* <img src={"https://ik.imagekit.io/lcq5etn9k/restro/mc-symbol_Yi6-dNRmE_J.svg"} className="right-icon field-icon" alt="" /> */}
+                //     </div>
+                //     <div className="col-6 form-group">
+                //       <label for="">Expiry Date</label>
+                //       <input
+                //         maxlength="5"
+                //         placeholder="MM/YY"
+                //         type="text"
+                //         onChange={(e) =>
+                //           setPaymentObj((pto) => ({
+                //             ...pto,
+                //             cardDetails: {
+                //               ...pto.cardDetails,
+                //               cardExpiry: e.target.value,
+                //             },
+                //           }))
+                //         }
+                //       />
+                //       <img
+                //         src={
+                //           "https://ik.imagekit.io/lcq5etn9k/restro/calendar_Gr23OBS-Q2.svg"
+                //         }
+                //         className="left-icon field-icon"
+                //         alt=""
+                //       />
+                //     </div>
+                //     <div className="col-6 form-group">
+                //       <label for="">CVV</label>
+                //       <input
+                //         maxlength="4"
+                //         type="password"
+                //         onChange={(e) =>
+                //           setPaymentObj((pto) => ({
+                //             ...pto,
+                //             cardDetails: {
+                //               ...pto.cardDetails,
+                //               cvv: e.target.value,
+                //             },
+                //           }))
+                //         }
+                //       />
+                //       <img
+                //         src={
+                //           "https://ik.imagekit.io/lcq5etn9k/restro/hint_nofsZ8__WxW.svg"
+                //         }
+                //         className="left-icon field-icon"
+                //         alt=""
+                //       />
+                //     </div>
+                //   </div>
+                // </div>
               )}
               {(paymentObj.type === "mada" || paymentObj.type === "cash")  && (
                 <div class="cash-content">
@@ -426,13 +483,13 @@ const Cart = (props) => {
           </div>
         </div>
 
-        <div className="order-btn">
+        {paymentObj.type == "cash" && <div className="order-btn">
           <div className="container-fluid">
             <a onClick={() => {paymentObj.type && setShowPayment(false)}}>
               <h6>{paymentObj.type == "card" ? t("use this card") : t("Select")}</h6>
             </a>
           </div>
-        </div>
+        </div>}
       </section>
     );
   }
@@ -648,6 +705,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   create,
+  createPayment
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cart);
