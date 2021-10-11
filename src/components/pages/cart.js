@@ -3,10 +3,13 @@ import { create } from "../../actions/order";
 import { connect } from "react-redux";
 import {t } from "../language";
 import { createPayment } from "../../actions/payment";
+import $ from 'jquery';
+
 const Cart = (props) => {
   const [cart, setCart] = useState({});
   const [checkoutDetail , setCheckoutDetail] = useState({});
   const [showPayment, setShowPayment] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [restaurant, setRestaurant] = useState(
     JSON.parse(localStorage.getItem("restaurant"))
   );
@@ -183,7 +186,6 @@ const Cart = (props) => {
     // unloadWidget()
     setTimeout(() => {
       setPaymentObj((pto) => ({ ...pto, type: "cash" }))
-
     }, 500)
 
   }
@@ -191,7 +193,20 @@ const Cart = (props) => {
   useEffect(() => {
     console.log(paymentObj)
     if(showPayment && paymentObj.type=="card"){
-      props.createPayment({amount:100} , (res) => {
+      setLoading(true);
+      props.createPayment({
+          orderNote: orderObj.orderNote,
+          orderType: orderObj.orderType,
+          products: cart,
+          tableNo:localStorage.getItem("tableNo"),
+          restaurant: localStorage.getItem("restaurant")
+            ? JSON.parse(localStorage.getItem("restaurant")).id
+            : "",
+          subTotalAmount: getPriceCountInCart(),
+          tax: calculateTax(),
+          totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()),
+          paymentType: paymentObj.type,
+      } , (res) => {
         setCheckoutDetail(res);
         console.log(res);
         var tag = document.createElement('script');
@@ -201,6 +216,56 @@ const Cart = (props) => {
         var body = document.getElementsByTagName('body')[0];
         body.appendChild(tag);
 
+        tag.onload = () => {
+          console.log("On load is running")
+          function wrapElement(element) {
+            var id = $(element).attr("id");
+            var wrapId = "wrap_" + id;
+            $(element).wrap('<div id="' +wrapId+'"></div>"'); 
+            return $('#'+wrapId);
+          }
+  
+          var methodMapping = {
+            "card": " Click to pay with card",
+            "mada": " Click to pay with mada",
+            "directDebit": " Click to pay with direct debit",
+            "prepayment-BOLETO": " Click to pay with Boleto",
+            "prepayment-BARPAY": " Click to pay with Barpay",
+            // "onlineTransfer-IDEAL": " Click to pay with iDeal",
+            "onlineTransfer-GIROPAY": " Click to pay with GiroPay",
+            "invoice-INVOICE": " Click to pay with Invoice",
+            "onlineTransfer-SOFORTUEBERWEISUNG": " Click to pay with SOFORT Uberweisung",
+            "virtualAccount-PASTEANDPAY_V": " Click to pay with PASTEandPAY",
+            "virtualAccount-VSTATION_V": " Click to pay with voucherstation",
+            "virtualAccount-PAYPAL": " Click to pay with PayPal",
+            "virtualAccount-APPLEPAY": " Click to pay with APPLEPAY",
+            "virtualAccount-UKASH": " Click to pay with Ukash",
+            "virtualAccount-QOOQO": " Click to pay with QOOQO",
+            "virtualAccount-KLARNA_INVOICE": " Click to pay with Klarna Invoice",
+            "virtualAccount-KLARNA_INSTALLMENTS": " Click to pay with Klarna Installments",
+            "cashOnDelivery": " Click to pay cash on delivery"
+          }
+          window.wpwlOptions = {
+              brandDetection: true,
+              locale: localStorage.getItem("language") == "en" ? "en" : "ar",
+              style: "card",
+              maskCvv: true,
+            onReady: function() {
+              $('.wpwl-container').each(function() {
+                var id = $(this).attr("id");
+                wrapElement(this).hide().before("<h4 class='payHead'>" + methodMapping[id.substring(0, id.lastIndexOf("_"))] + "</h4>");
+              });
+              $("h4").click(function() {
+                $(this).next().slideToggle();
+              });
+              setLoading(false)
+
+            }
+          }
+        }
+
+        
+        
       })
     } else {
 
@@ -351,15 +416,16 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                   </li>} */}
                 </ul>
               </div>
-               <div style={{display: paymentObj.type == "card" ? "" : "none", marginTop: 10}}><form 
-                  id="my-payment-form"
-                  action="http://localhost:5000/api/payment/capture-payment"
-                  class="paymentWidgets"
-                  data-brands={`VISA MASTER AMEX ${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""} ${restaurant?.menu?.settings?.payment?.mada ? "MADA" : ""}`}
-                >
-                  <input type="hidden" value="Manish" name="teest" />
+               <div style={{display: paymentObj.type == "cash" ? "none" : loading ? "none" : "", marginTop: 10}}>
+                  <form 
+                    id="my-payment-form"
+                    action="http://localhost:5000/api/payment/capture-payment"
+                    class="paymentWidgets"
+                    data-brands={`VISA MASTER AMEX PAYPAL MADA APPLEPAY`}
+                  >
+                    <input type="hidden" value="Manish" name="teest" />
 
-                </form>
+                  </form>
                 </div>
               {paymentObj.type == "card" && (
                 <form 
