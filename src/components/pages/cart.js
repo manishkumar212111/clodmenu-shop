@@ -19,7 +19,7 @@ const Cart = (props) => {
     orderNote: "",
   });
   const [paymentObj, setPaymentObj] = useState({
-    type: "",
+    type: "cash",
     cardDetails: {},
   });
 
@@ -147,7 +147,11 @@ const Cart = (props) => {
     return 0;
   }
   console.log(props);
+
+
   const handleCreateOrder = () => {
+    
+    
     if(!(paymentObj && paymentObj.type)){
       
       return;
@@ -173,17 +177,15 @@ const Cart = (props) => {
   };
 
   const handleCashClick = () => {
-      var unloadWidget = function() {
-        if (window.wpwl !== undefined && window.wpwl.unload !== undefined) {
-            window.wpwl.unload();
-            // document.getElementsByTagName("script").map(function (itm) {
-            //     if (itm.src.indexOf('static.min.js') !== -1) {
-            //       itm.remove();
-            //     }
-            // });
-        }
-    };
+      // var unloadWidget = function() {
+      //     if (window.wpwl !== undefined && window.wpwl.unload !== undefined) {
+      //         window.wpwl.unload();
+      //     }
+      // };
     // unloadWidget()
+    $("#payCash").show();
+    $(".tempC a").removeClass("active");
+
     setTimeout(() => {
       setPaymentObj((pto) => ({ ...pto, type: "cash" }))
     }, 500)
@@ -192,7 +194,6 @@ const Cart = (props) => {
 
   useEffect(() => {
     console.log(paymentObj)
-    if(showPayment && paymentObj.type=="card"){
       setLoading(true);
       props.createPayment({
           orderNote: orderObj.orderNote,
@@ -204,7 +205,7 @@ const Cart = (props) => {
             : "",
           subTotalAmount: getPriceCountInCart(),
           tax: calculateTax(),
-          totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()),
+          totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()).toFixed(2),
           paymentType: paymentObj.type,
       } , (res) => {
         setCheckoutDetail(res);
@@ -226,8 +227,8 @@ const Cart = (props) => {
           }
   
           var methodMapping = {
-            "card": " Click to pay with card",
-            "mada": " Click to pay with mada",
+            "card": "Pay With Card",
+            "mada": "Pay With Mada",
             "directDebit": " Click to pay with direct debit",
             "prepayment-BOLETO": " Click to pay with Boleto",
             "prepayment-BARPAY": " Click to pay with Barpay",
@@ -237,8 +238,8 @@ const Cart = (props) => {
             "onlineTransfer-SOFORTUEBERWEISUNG": " Click to pay with SOFORT Uberweisung",
             "virtualAccount-PASTEANDPAY_V": " Click to pay with PASTEandPAY",
             "virtualAccount-VSTATION_V": " Click to pay with voucherstation",
-            "virtualAccount-PAYPAL": " Click to pay with PayPal",
-            "virtualAccount-APPLEPAY": " Click to pay with APPLEPAY",
+            // "virtualAccount-PAYPAL": " Click to pay with PayPal",
+            "virtualAccount-APPLEPAY": "Pay With APPLEPAY",
             "virtualAccount-UKASH": " Click to pay with Ukash",
             "virtualAccount-QOOQO": " Click to pay with QOOQO",
             "virtualAccount-KLARNA_INVOICE": " Click to pay with Klarna Invoice",
@@ -248,14 +249,22 @@ const Cart = (props) => {
           window.wpwlOptions = {
               brandDetection: true,
               locale: localStorage.getItem("language") == "en" ? "en" : "ar",
-              style: "card",
+              style: "plain",
               maskCvv: true,
             onReady: function() {
+              // <ul class="payment-option"><li><a class=""><i class="bx bx-wallet"></i> Pay Cash</a></li></ul></div>
               $('.wpwl-container').each(function() {
                 var id = $(this).attr("id");
-                wrapElement(this).hide().before("<h4 class='payHead'>" + methodMapping[id.substring(0, id.lastIndexOf("_"))] + "</h4>");
+                console.log(id, "Id")
+                wrapElement(this).hide().before("<div  id='" + (id.indexOf("card")> -1 ? "card" : id.indexOf("APPLEPAY") > -1 ? "applepay" : "") + "' class='pay-method tempC' style='margin-top : 5px;'><ul class='payment-option'><li><a> <i class='bx bx-credit-card-alt'></i> " + methodMapping[id.substring(0, id.lastIndexOf("_"))] + "</a></li></ul></div>");
               });
-              $("h4").click(function() {
+              $(".tempC").click(function() {
+                console.log(this.id)
+                setPaymentObj((pto) => ({ ...pto, type: this.id}));
+                $(".tempC a").removeClass("active");
+
+                $("#"+this.id+" a").addClass("active");
+                $("#payCash").hide();
                 $(this).next().slideToggle();
               });
               setLoading(false)
@@ -263,14 +272,8 @@ const Cart = (props) => {
             }
           }
         }
-
-        
-        
       })
-    } else {
-
-    }
-  }, [showPayment , paymentObj]);
+  }, [showPayment]);
 
 
   if (props.order_detail_loading) {
@@ -363,7 +366,7 @@ const Cart = (props) => {
 console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""} ${restaurant?.menu?.settings?.payment?.creditCard ? "VISA MASTER AMEX " : ""} ${restaurant?.menu?.settings?.payment?.mada ? "MADA" : ""}`)
   if (showPayment) {
     return (
-      <section className="app-body">
+      <section className="app-body paymentPage">
         <header>
           <div className="container-fluid d-flex">
             <span onClick={() => setShowPayment(false)}>
@@ -373,11 +376,12 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
           </div>
         </header>
 
+
         <div className="browser-main">
           <div className="payment-method">
             <div className="container-fluid">
-              <div className="pay-method">
-                <h4>{t("Payment method")}</h4>
+              <h4>{t("Payment method")}</h4>
+              <div className="pay-method" style={{marginBottom: -5}}>
                 <ul className="payment-option">
                   {restaurant?.menu?.settings?.payment.cash && <li
                     onClick={() =>
@@ -388,7 +392,247 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                       <i className="bx bx-wallet"></i> {("Pay Cash")}
                     </a>
                   </li>}
-                  {restaurant?.menu?.settings?.payment.creditCard && <li
+                </ul>
+              </div>
+               <div style={{ marginTop: 10}}>
+                  <form 
+                    id="my-payment-form"
+                    action="http://localhost:5000/api/payment/capture-payment"
+                    class="paymentWidgets"
+                    data-brands={`VISA MASTER AMEX MADA APPLEPAY`}
+                  >
+                    <input type="hidden" value="Manish" name="teest" />
+
+                  </form>
+                </div>
+              {(paymentObj.type === "cash")  && (
+                <div class="cash-content">
+                  <img
+                    class="img-fluid"
+                    src={
+                      "https://ik.imagekit.io/lcq5etn9k/restro/wallet-big_TNI1TIi4FT.png"
+                    }
+                    alt=""
+                  />
+                  <p>{("Great we will accept your payment after serving you.")}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {paymentObj.type == "cash" && <div id="payCash" className="order-btn">
+          <div className="container-fluid">
+            <a onClick={() => handleCreateOrder()}>
+              <h6>{paymentObj.type == "card" ? t("use this card") : t("Pay Cash")}</h6>
+            </a>
+          </div>
+        </div>}
+      </section>
+    );
+  }
+
+  const totalAmount = parseFloat(getPriceCountInCart()) + parseFloat(calculateTax());
+  console.log(orderObj);
+  return (
+    <section className="app-body">
+      <header>
+        <div className="container-fluid d-flex">
+          <span onClick={() => window.history.go(-1)}>
+            <i className="bx bx-chevron-left"></i>
+          </span>
+          <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
+        </div>
+      </header>
+      <div className="browser-main">
+        <div className="cart-area">
+          <div className="container-fluid">
+            <ul>
+              {Object.keys(cart).map((itm) =>
+                Object.keys(cart[itm]).map((item) => (
+                  <li>
+                    <div className="dish-quan-wrapper">
+                      <div className="dis-quan">
+                        <p>{cart[itm][item].qty}X</p>
+                      </div>
+                      <div className="dish-name">
+                        <h5>{localStorage.getItem("language") =="en" ?  cart[itm][item].title : cart[itm][item].titleAr}</h5>
+                        <p>
+                          {cart[itm][item].modifiers &&
+                            Object.keys(cart[itm][item].modifiers)
+                              .map((data) => {
+                                let temp = [];
+                                temp = cart[itm][item].modifiers[data]
+                                  .map((dta) => localStorage.getItem("language") =="en" ? dta.title : dta.titleAr)
+                                  .join(",");
+                                return temp;
+                              })
+                              .join(", ")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="dish-cost">
+                      <h5>
+                      <span style={{marginRight : 2}} className="arabicRs">S<span className="arabicSmallRs">R </span></span>  {getSingleProductCount(cart[itm][item]).price}
+                        <a onClick={() => deleteProductFromCart(item, itm)}>
+                          <i className="bx bx-trash-alt"></i>
+                        </a>
+                      </h5>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+        </div>
+
+
+        <div className="order-instruction">
+          <div className="container-fluid">
+            <div className="instruction">
+              <h5>{t("Order Instructions")}</h5>
+              <textarea
+                name=""
+                placeholder={t("Ex - Do not put bell pepper in pizza, serve beer chilled")}
+                id=""
+                value={orderObj.orderNote}
+                cols="30"
+                onChange={(e) =>
+                  setOrderObj((ord) => ({ ...ord, orderNote: e.target.value }))
+                }
+                rows="2"
+              ></textarea>
+            </div>
+            <div className="order-deliver-option">
+              <ul>
+                <li>
+                  <div className="radio-item">
+                    <input
+                      type="radio"
+                      id="orderTyp"
+                      checked={orderObj.orderType == "dinein"}
+                      name="orderType"
+                    />
+                    <label
+                      for="table-order"
+                      onClick={(e) => {
+                        setOrderObj((ord) => ({ ...ord, orderType: "dinein" }));
+                      }}
+                    >
+                      <img
+                        src="https://ik.imagekit.io/lcq5etn9k/restro/order-table_VebSza4hO.png"
+                        alt=""
+                      />{" "}
+                      {t("Order Serve At")}
+                    </label>
+                  </div>
+                  {localStorage.getItem("tableNo") && (
+                    <p>
+                      {t("Table")}{" "}
+                      {localStorage.getItem("tableNo") !== "undefined"
+                        ? localStorage.getItem("tableNo")
+                        : ""}
+                    </p>
+                  )}
+                </li>
+                {restaurant?.menu?.settings?.takeAwayOrder && <li>
+                  <div className="radio-item">
+                    <input
+                      type="radio"
+                      onChange={(e) => {
+                        setOrderObj((ord) => ({
+                          ...ord,
+                          orderType: "dineout",
+                        }));
+                      }}
+                      id="orderType"
+                      name="orderType"
+                      checked={orderObj.orderType == "dineout"}
+                    />
+                    <label
+                      for="takeaway-order"
+                      onClick={(e) => {
+                        setOrderObj((ord) => ({
+                          ...ord,
+                          orderType: "dineout",
+                        }));
+                      }}
+                    >
+                      <img
+                        src="https://ik.imagekit.io/lcq5etn9k/restro/take-away_JcWi5wpzBM.png"
+                        alt=""
+                      />{" "}
+                      {t("Take Away")}
+                    </label>
+                  </div>
+                </li>}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="total-amount">
+          <div className="container-fluid">
+            <div className="total">
+              <p>{t("Item Total")}</p>
+              <p className="price-total"><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getPriceCountInCart()}</p>
+            </div>
+            <div className="total">
+              <p>{t("Sales Tax")}</p>
+              <p className="price-total">SR {calculateTax()}</p>
+            </div>
+            <div className="total all-total">
+              <p>{t("Total")}</p>
+              <p><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {totalAmount}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {!showPayment && (
+        <div className="order-btn">
+          <div className="container-fluid" onClick={() => setShowPayment(true)}>
+            <a>
+              <p>
+                {t("Total")} <span>SR {totalAmount}</span>
+              </p>
+              <h5>
+                {t("Place Order")} <i className="bx bx-chevron-right"></i>
+              </h5>
+            </a>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
+
+const mapStateToProps = (state) => ({
+  orderDetail: state.order.orderDetail,
+  order_detail_loading: state.order.order_detail_loading,
+  orderError: state.order.orderError,
+});
+
+const mapDispatchToProps = {
+  create,
+  createPayment
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);
+
+
+{/* <div className="pay-method" style={{marginBottom: -5}}>
+                <ul className="payment-option">
+                  {restaurant?.menu?.settings?.payment.cash && <li
+                    onClick={() =>
+                      handleCashClick()
+                    }
+                  >
+                    <a>
+                      <i className="bx bx-wallet"></i> {("Pay Cash")}
+                    </a>
+                  </li>}
+                  {/* {restaurant?.menu?.settings?.payment.creditCard && <li
                     onClick={() =>
                       setPaymentObj((pto) => ({ ...pto, type: "card" }))
                     }
@@ -396,7 +640,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                     <a className={paymentObj.type == "card" ? "active" : ""}>
                       <i className="bx bx-credit-card-alt"></i> {("Pay Via Card")}
                     </a>
-                  </li>}
+                  </li>} */}
                   {/* {restaurant?.menu?.settings?.payment.mada && <li
                     onClick={() =>
                       setPaymentObj((pto) => ({ ...pto, type: "mada" }))
@@ -413,15 +657,15 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                       </i>{" "}
                       {t("MADA")}
                     </a>
-                  </li>} */}
+                  </li>} 
                 </ul>
               </div>
-               <div style={{display: paymentObj.type == "cash" ? "none" : loading ? "none" : "", marginTop: 10}}>
+               <div style={{ marginTop: 10}}>
                   <form 
                     id="my-payment-form"
                     action="http://localhost:5000/api/payment/capture-payment"
                     class="paymentWidgets"
-                    data-brands={`VISA MASTER AMEX PAYPAL MADA APPLEPAY`}
+                    data-brands={`VISA MASTER AMEX MADA APPLEPAY`}
                   >
                     <input type="hidden" value="Manish" name="teest" />
 
@@ -532,246 +776,17 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                 //     </div>
                 //   </div>
                 // </div>
-              )}
-              {(paymentObj.type === "mada" || paymentObj.type === "cash")  && (
-                <div class="cash-content">
-                  <img
-                    class="img-fluid"
-                    src={
-                      "https://ik.imagekit.io/lcq5etn9k/restro/wallet-big_TNI1TIi4FT.png"
-                    }
-                    alt=""
-                  />
-                  <p>{("Great we will accept your payment after serving you.")}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {paymentObj.type == "cash" && <div className="order-btn">
-          <div className="container-fluid">
-            <a onClick={() => {paymentObj.type && setShowPayment(false)}}>
-              <h6>{paymentObj.type == "card" ? t("use this card") : t("Select")}</h6>
-            </a>
-          </div>
-        </div>}
-      </section>
-    );
-  }
-  console.log(orderObj);
-  return (
-    <section className="app-body">
-      <header>
-        <div className="container-fluid d-flex">
-          <span onClick={() => window.history.go(-1)}>
-            <i className="bx bx-chevron-left"></i>
-          </span>
-          <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
-        </div>
-      </header>
-      <div className="browser-main">
-        <div className="cart-area">
-          <div className="container-fluid">
-            <ul>
-              {Object.keys(cart).map((itm) =>
-                Object.keys(cart[itm]).map((item) => (
-                  <li>
-                    <div className="dish-quan-wrapper">
-                      <div className="dis-quan">
-                        <p>{cart[itm][item].qty}X</p>
-                      </div>
-                      <div className="dish-name">
-                        <h5>{localStorage.getItem("language") =="en" ?  cart[itm][item].title : cart[itm][item].titleAr}</h5>
-                        <p>
-                          {cart[itm][item].modifiers &&
-                            Object.keys(cart[itm][item].modifiers)
-                              .map((data) => {
-                                let temp = [];
-                                temp = cart[itm][item].modifiers[data]
-                                  .map((dta) => localStorage.getItem("language") =="en" ? dta.title : dta.titleAr)
-                                  .join(",");
-                                return temp;
-                              })
-                              .join(", ")}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="dish-cost">
-                      <h5>
-                      <span style={{marginRight : 2}} className="arabicRs">S<span className="arabicSmallRs">R </span></span>  {getSingleProductCount(cart[itm][item]).price}
-                        <a onClick={() => deleteProductFromCart(item, itm)}>
-                          <i className="bx bx-trash-alt"></i>
-                        </a>
-                      </h5>
-                    </div>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-        </div>
-
-        <div className="select-payment">
-          <div className="container-fluid">
-            <a onClick={() => setShowPayment(true)}>
-              <h6>{t("Payment Option")}</h6>
-              <p>
-                {/* <img
-                  src={
-                    "https://ik.imagekit.io/lcq5etn9k/restro/visa_0t_PmIryq2.png"
-                  }
-                  alt=""
-                /> */}
-                {paymentObj.type == "card"
-                  ? `Card ${
-                      paymentObj?.cardDetails?.cardNumber
-                        ? "(Ending with " +
-                          paymentObj?.cardDetails?.cardNumber.slice(
-                            paymentObj?.cardDetails?.cardNumber.length - 4,
-                            paymentObj?.cardDetails?.cardNumber.length
-                          ) +
-                          ")"
-                        : ""
-                    }`
-                  : paymentObj.type == "mada"
-                  ? t("Mada")
-                  : paymentObj.type === "cash" ? t("Cash") : t("Select")}
-                <i className="bx bx-chevron-right"></i>
-              </p>
-            </a>
-          </div>
-        </div>
-
-        <div className="order-instruction">
-          <div className="container-fluid">
-            <div className="instruction">
-              <h5>{t("Order Instructions")}</h5>
-              <textarea
-                name=""
-                placeholder={t("Ex - Do not put bell pepper in pizza, serve beer chilled")}
-                id=""
-                value={orderObj.orderNote}
-                cols="30"
-                onChange={(e) =>
-                  setOrderObj((ord) => ({ ...ord, orderNote: e.target.value }))
-                }
-                rows="2"
-              ></textarea>
-            </div>
-            <div className="order-deliver-option">
-              <ul>
-                <li>
-                  <div className="radio-item">
-                    <input
-                      type="radio"
-                      id="orderTyp"
-                      checked={orderObj.orderType == "dinein"}
-                      name="orderType"
-                    />
-                    <label
-                      for="table-order"
-                      onClick={(e) => {
-                        setOrderObj((ord) => ({ ...ord, orderType: "dinein" }));
-                      }}
-                    >
-                      <img
-                        src="https://ik.imagekit.io/lcq5etn9k/restro/order-table_VebSza4hO.png"
-                        alt=""
-                      />{" "}
-                      {t("Order Serve At")}
-                    </label>
-                  </div>
-                  {localStorage.getItem("tableNo") && (
-                    <p>
-                      {t("Table")}{" "}
-                      {localStorage.getItem("tableNo") !== "undefined"
-                        ? localStorage.getItem("tableNo")
-                        : ""}
-                    </p>
-                  )}
-                </li>
-                {restaurant?.menu?.settings?.takeAwayOrder && <li>
-                  <div className="radio-item">
-                    <input
-                      type="radio"
-                      onChange={(e) => {
-                        setOrderObj((ord) => ({
-                          ...ord,
-                          orderType: "dineout",
-                        }));
-                      }}
-                      id="orderType"
-                      name="orderType"
-                      checked={orderObj.orderType == "dineout"}
-                    />
-                    <label
-                      for="takeaway-order"
-                      onClick={(e) => {
-                        setOrderObj((ord) => ({
-                          ...ord,
-                          orderType: "dineout",
-                        }));
-                      }}
-                    >
-                      <img
-                        src="https://ik.imagekit.io/lcq5etn9k/restro/take-away_JcWi5wpzBM.png"
-                        alt=""
-                      />{" "}
-                      {t("Take Away")}
-                    </label>
-                  </div>
-                </li>}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="total-amount">
-          <div className="container-fluid">
-            <div className="total">
-              <p>{t("Item Total")}</p>
-              <p className="price-total"><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {getPriceCountInCart()}</p>
-            </div>
-            <div className="total">
-              <p>{t("Sales Tax")}</p>
-              <p className="price-total">SR {calculateTax()}</p>
-            </div>
-            <div className="total all-total">
-              <p>{t("Total")}</p>
-              <p><span style={{marginRight : 0}} className="arabicRs">S<span className="arabicSmallRs">R</span></span> {parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {!showPayment && (
-        <div className="order-btn">
-          <div className="container-fluid" onClick={handleCreateOrder}>
-            <a>
-              <p>
-                {t("Total")} <span>SR {parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())}</span>
-              </p>
-              <h5>
-                {t("Place Order")} <i className="bx bx-chevron-right"></i>
-              </h5>
-            </a>
-          </div>
-        </div>
-      )}
-    </section>
-  );
-};
-
-const mapStateToProps = (state) => ({
-  orderDetail: state.order.orderDetail,
-  order_detail_loading: state.order.order_detail_loading,
-  orderError: state.order.orderError,
-});
-
-const mapDispatchToProps = {
-  create,
-  createPayment
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Cart);
+              
+            //   {(paymentObj.type === "cash")  && (
+            //     <div class="cash-content">
+            //       <img
+            //         class="img-fluid"
+            //         src={
+            //           "https://ik.imagekit.io/lcq5etn9k/restro/wallet-big_TNI1TIi4FT.png"
+            //         }
+            //         alt=""
+            //       />
+            //       <p>{("Great we will accept your payment after serving you.")}</p>
+            //     </div>
+            //   )}
+            // </div> */}

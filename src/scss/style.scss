@@ -410,9 +410,9 @@ input#number1 {
 .pay-method {
   background-color: #ffffff;
   border-radius: 15px;
-  padding: 20px 15px;
+  padding: 15px 15px;
   box-shadow: 0 4px 15px rgb(0 0 0 / 5%);
-  margin-top: 110px;
+  // margin-top: 110px;
 }
 .pay-method h4 {
   font-size: 18px;
@@ -422,10 +422,11 @@ input#number1 {
 ul.payment-option {
   list-style: none;
   padding: 0;
-  margin: 15px 0 0;
+  margin: 5px 0 0;
 }
 ul.payment-option li {
   margin-bottom: 15px;
+  list-style: none;
 }
 ul.payment-option li:last-child {
   margin-bottom: 0;
@@ -775,3 +776,20 @@ h4.payHead {
   cursor: pointer;
 }
 .wpwl-container {display:none;}
+
+.wpwl-button-pay {
+    position: fixed;
+    bottom: 0px;
+    background-color: #DA3643;
+    left: 0px;
+    width: 100%;
+    margin: auto;
+    height: 73px;
+}
+.wpwl-label-brand {
+  display: none;
+}
+
+.wpwl-wrapper-brand {
+  display: none;
+}
