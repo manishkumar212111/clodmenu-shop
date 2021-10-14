@@ -29,6 +29,7 @@ const Home = (props) => {
   }, [props.getRestaurantById]);
 
   useEffect(() => {
+    localStorage.setItem("baseUrl" , window?.location.href);
 
     if(props?.match?.params?.clientId && (props?.match?.params?.clientId != localStorage.getItem("clientId"))){
       localStorage.setItem("clientId" , props?.match?.params?.clientId);

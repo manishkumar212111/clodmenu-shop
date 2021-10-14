@@ -4,12 +4,16 @@ import { connect } from "react-redux";
 import {t } from "../language";
 import { createPayment } from "../../actions/payment";
 import $ from 'jquery';
+import querystring from 'querystring';
+import Loader from "react-loader-spinner";
 
 const Cart = (props) => {
+  console.log(props)
   const [cart, setCart] = useState({});
   const [checkoutDetail , setCheckoutDetail] = useState({});
   const [showPayment, setShowPayment] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [queryObj , setQueryObj] = useState({});
   const [restaurant, setRestaurant] = useState(
     JSON.parse(localStorage.getItem("restaurant"))
   );
@@ -22,6 +26,21 @@ const Cart = (props) => {
     type: "cash",
     cardDetails: {},
   });
+
+  useEffect(() => {
+    let search = props.location.search;
+    search = (querystring.parse(search));
+    console.log(search)
+    if(search && search["?type"]){
+      setQueryObj(search);
+      if(search["?type"] == "success"){
+        setCart({});
+        localStorage.setItem("cart", JSON.stringify({}));
+      } else if(search["?type"] == "failed"){
+        setShowPayment(true);
+      }
+    } 
+  },[props.location]);
 
   useEffect(() => {
     localStorage.getItem("cart") &&
@@ -67,7 +86,9 @@ const Cart = (props) => {
 
     // }
   };
-
+  const handleBackClick = () => {
+    window.location.href = localStorage.getItem("baseUrl")
+  }
   const updateStateAndLocalStorage = (obj) => {
     console.log(obj);
     let returnObj = {};
@@ -194,85 +215,89 @@ const Cart = (props) => {
 
   useEffect(() => {
     console.log(paymentObj)
-      setLoading(true);
-      props.createPayment({
-          orderNote: orderObj.orderNote,
-          orderType: orderObj.orderType,
-          products: cart,
-          tableNo:localStorage.getItem("tableNo"),
-          restaurant: localStorage.getItem("restaurant")
-            ? JSON.parse(localStorage.getItem("restaurant")).id
-            : "",
-          subTotalAmount: getPriceCountInCart(),
-          tax: calculateTax(),
-          totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()).toFixed(2),
-          paymentType: paymentObj.type,
-      } , (res) => {
-        setCheckoutDetail(res);
-        console.log(res);
-        var tag = document.createElement('script');
-        tag.async = true;
-        tag.id="test-payment"
-        tag.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${res.id}`;
-        var body = document.getElementsByTagName('body')[0];
-        body.appendChild(tag);
+      if(!queryObj?.orderId && showPayment){
+        setLoading(true);
+        props.createPayment({
+            orderNote: orderObj.orderNote,
+            orderType: orderObj.orderType,
+            products: cart,
+            tableNo:localStorage.getItem("tableNo"),
+            restaurant: localStorage.getItem("restaurant")
+              ? JSON.parse(localStorage.getItem("restaurant")).id
+              : "",
+            subTotalAmount: getPriceCountInCart(),
+            tax: calculateTax(),
+            totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()).toFixed(2),
+            paymentType: paymentObj.type,
+        } , (res) => {
+          setCheckoutDetail(res);
+          console.log(res);
+          var tag = document.createElement('script');
+          tag.async = true;
+          tag.id="test-payment"
+          tag.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${res.id}`;
+          var body = document.getElementsByTagName('body')[0];
+          body.appendChild(tag);
 
-        tag.onload = () => {
-          console.log("On load is running")
-          function wrapElement(element) {
-            var id = $(element).attr("id");
-            var wrapId = "wrap_" + id;
-            $(element).wrap('<div id="' +wrapId+'"></div>"'); 
-            return $('#'+wrapId);
-          }
-  
-          var methodMapping = {
-            "card": "Pay With Card",
-            "mada": "Pay With Mada",
-            "directDebit": " Click to pay with direct debit",
-            "prepayment-BOLETO": " Click to pay with Boleto",
-            "prepayment-BARPAY": " Click to pay with Barpay",
-            // "onlineTransfer-IDEAL": " Click to pay with iDeal",
-            "onlineTransfer-GIROPAY": " Click to pay with GiroPay",
-            "invoice-INVOICE": " Click to pay with Invoice",
-            "onlineTransfer-SOFORTUEBERWEISUNG": " Click to pay with SOFORT Uberweisung",
-            "virtualAccount-PASTEANDPAY_V": " Click to pay with PASTEandPAY",
-            "virtualAccount-VSTATION_V": " Click to pay with voucherstation",
-            // "virtualAccount-PAYPAL": " Click to pay with PayPal",
-            "virtualAccount-APPLEPAY": "Pay With APPLEPAY",
-            "virtualAccount-UKASH": " Click to pay with Ukash",
-            "virtualAccount-QOOQO": " Click to pay with QOOQO",
-            "virtualAccount-KLARNA_INVOICE": " Click to pay with Klarna Invoice",
-            "virtualAccount-KLARNA_INSTALLMENTS": " Click to pay with Klarna Installments",
-            "cashOnDelivery": " Click to pay cash on delivery"
-          }
-          window.wpwlOptions = {
-              brandDetection: true,
-              locale: localStorage.getItem("language") == "en" ? "en" : "ar",
-              style: "plain",
-              maskCvv: true,
-            onReady: function() {
-              // <ul class="payment-option"><li><a class=""><i class="bx bx-wallet"></i> Pay Cash</a></li></ul></div>
-              $('.wpwl-container').each(function() {
-                var id = $(this).attr("id");
-                console.log(id, "Id")
-                wrapElement(this).hide().before("<div  id='" + (id.indexOf("card")> -1 ? "card" : id.indexOf("APPLEPAY") > -1 ? "applepay" : "") + "' class='pay-method tempC' style='margin-top : 5px;'><ul class='payment-option'><li><a> <i class='bx bx-credit-card-alt'></i> " + methodMapping[id.substring(0, id.lastIndexOf("_"))] + "</a></li></ul></div>");
-              });
-              $(".tempC").click(function() {
-                console.log(this.id)
-                setPaymentObj((pto) => ({ ...pto, type: this.id}));
-                $(".tempC a").removeClass("active");
+          tag.onload = () => {
+            console.log("On load is running")
+            function wrapElement(element) {
+              var id = $(element).attr("id");
+              var wrapId = "wrap_" + id;
+              $(element).wrap('<div id="' +wrapId+'"></div>"'); 
+              return $('#'+wrapId);
+            }
+    
+            var methodMapping = {
+              "card": "Pay With Card",
+              "mada": "Pay With Mada",
+              "directDebit": " Click to pay with direct debit",
+              "prepayment-BOLETO": " Click to pay with Boleto",
+              "prepayment-BARPAY": " Click to pay with Barpay",
+              // "onlineTransfer-IDEAL": " Click to pay with iDeal",
+              "onlineTransfer-GIROPAY": " Click to pay with GiroPay",
+              "invoice-INVOICE": " Click to pay with Invoice",
+              "onlineTransfer-SOFORTUEBERWEISUNG": " Click to pay with SOFORT Uberweisung",
+              "virtualAccount-PASTEANDPAY_V": " Click to pay with PASTEandPAY",
+              "virtualAccount-VSTATION_V": " Click to pay with voucherstation",
+              // "virtualAccount-PAYPAL": " Click to pay with PayPal",
+              "virtualAccount-APPLEPAY": "Pay With APPLEPAY",
+              "virtualAccount-UKASH": " Click to pay with Ukash",
+              "virtualAccount-QOOQO": " Click to pay with QOOQO",
+              "virtualAccount-KLARNA_INVOICE": " Click to pay with Klarna Invoice",
+              "virtualAccount-KLARNA_INSTALLMENTS": " Click to pay with Klarna Installments",
+              "cashOnDelivery": " Click to pay cash on delivery"
+            }
+            window.wpwlOptions = {
+                brandDetection: true,
+                locale: localStorage.getItem("language") == "en" ? "en" : "ar",
+                style: "plain",
+                maskCvv: true,
+              onReady: function() {
+                // <ul class="payment-option"><li><a class=""><i class="bx bx-wallet"></i> Pay Cash</a></li></ul></div>
+                $('.wpwl-container').each(function() {
+                  var id = $(this).attr("id");
+                  console.log(id, "Id")
+                  wrapElement(this).hide().before("<div  id='" + (id.indexOf("card")> -1 ? "card" : id.indexOf("APPLEPAY") > -1 ? "applepay" : "") + "' class='pay-method tempC' style='margin-top : 5px;'><ul class='payment-option'><li><a> <i class='bx bx-credit-card-alt'></i> " + methodMapping[id.substring(0, id.lastIndexOf("_"))] + "</a></li></ul></div>");
+                });
+                $(".tempC").click(function() {
+                  console.log(this.id)
+                  setPaymentObj((pto) => ({ ...pto, type: this.id}));
+                  $(".tempC a").removeClass("active");
 
-                $("#"+this.id+" a").addClass("active");
-                $("#payCash").hide();
-                $(this).next().slideToggle();
-              });
-              setLoading(false)
+                  $("#"+this.id+" a").addClass("active");
+                  $("#payCash").hide();
+                  $(this).next().slideToggle();
+                });
+                setLoading(false)
 
+              }
             }
           }
-        }
-      })
+        
+        })
+        
+      }
   }, [showPayment]);
 
 
@@ -303,7 +328,7 @@ const Cart = (props) => {
     );
   }
 
-  if (props?.orderDetail?.id) {
+  if (props?.orderDetail?.id || (queryObj["?type"] && queryObj?.orderId)) {
     return (
       <section class="app-body">
         <header>
@@ -325,7 +350,7 @@ const Cart = (props) => {
               <p className="mt-5">
                 {t("We have start preparing your order, it will be served you soon")}
               </p>
-              <h3>{t("Order Number")} - {props?.orderDetail?.orderNo}</h3>
+              <h3>{t("Order Number")} - {queryObj?.orderId || props?.orderDetail?.orderNo}</h3>
             </div>
           </div>
         </div>
@@ -333,7 +358,7 @@ const Cart = (props) => {
         <div class="order-btn">
           <div class="container-fluid">
             <h4>{t("Missed Something ?")}</h4>
-            <a onClick={() => window.history.go(-1)}>
+            <a onClick={() => handleBackClick()}>
               <h6>{t("Order More")}</h6>
             </a>
           </div>
@@ -347,7 +372,7 @@ const Cart = (props) => {
       <section className="app-body">
         <header>
           <div className="container-fluid d-flex">
-            <span onClick={() => window.history.go(-1)}>
+            <span onClick={() => handleBackClick()}>
               <i className="bx bx-chevron-left"></i>
             </span>
             <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
@@ -364,6 +389,16 @@ const Cart = (props) => {
     );
   }
 console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""} ${restaurant?.menu?.settings?.payment?.creditCard ? "VISA MASTER AMEX " : ""} ${restaurant?.menu?.settings?.payment?.mada ? "MADA" : ""}`)
+  let paymentTypeList = " ";
+  if(restaurant?.menu?.settings?.payment.creditCard){
+    paymentTypeList += "VISA MASTER AMEX "
+  }
+  if(restaurant?.menu?.settings?.payment.mada){
+    paymentTypeList += "MADA "
+  }
+  if(restaurant?.menu?.settings?.payment.applePay){
+    paymentTypeList += "APPLEPAY "
+  }
   if (showPayment) {
     return (
       <section className="app-body paymentPage">
@@ -376,12 +411,15 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
           </div>
         </header>
 
-
         <div className="browser-main">
           <div className="payment-method">
             <div className="container-fluid">
+              {queryObj && queryObj.message && <div ><p style={{color: "red"}}>{queryObj.message}</p></div>}
               <h4>{t("Payment method")}</h4>
-              <div className="pay-method" style={{marginBottom: -5}}>
+              {loading && <div style={{ marginTop: "20%", marginLeft: "auto", marginRight: "auto", width:100}}>
+                <Loader />
+              </div>}
+              <div className="pay-method" style={{marginBottom: -5 , display: loading ? "none": ""}}>
                 <ul className="payment-option">
                   {restaurant?.menu?.settings?.payment.cash && <li
                     onClick={() =>
@@ -399,13 +437,13 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                     id="my-payment-form"
                     action="http://localhost:5000/api/payment/capture-payment"
                     class="paymentWidgets"
-                    data-brands={`VISA MASTER AMEX MADA APPLEPAY`}
+                    data-brands={paymentTypeList}
                   >
                     <input type="hidden" value="Manish" name="teest" />
 
                   </form>
                 </div>
-              {(paymentObj.type === "cash")  && (
+              {(paymentObj.type === "cash" && !loading)  && (
                 <div class="cash-content">
                   <img
                     class="img-fluid"
@@ -438,7 +476,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
     <section className="app-body">
       <header>
         <div className="container-fluid d-flex">
-          <span onClick={() => window.history.go(-1)}>
+          <span onClick={() => handleBackClick()}>
             <i className="bx bx-chevron-left"></i>
           </span>
           <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
