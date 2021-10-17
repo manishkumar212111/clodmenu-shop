@@ -6,6 +6,7 @@ import { createPayment } from "../../actions/payment";
 import $ from 'jquery';
 import querystring from 'querystring';
 import Loader from "react-loader-spinner";
+import { BASE_URL } from "../../API/config";
 
 const Cart = (props) => {
   console.log(props)
@@ -435,7 +436,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                <div style={{ marginTop: 10}}>
                   <form 
                     id="my-payment-form"
-                    action="http://localhost:5000/api/payment/capture-payment"
+                    action={`${BASE_URL}api/payment/capture-payment`}
                     class="paymentWidgets"
                     data-brands={paymentTypeList}
                   >
