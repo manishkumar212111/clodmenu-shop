@@ -79,7 +79,6 @@ class Layout extends React.Component {
       console.log(this.state, this.props);
 
         return (
-          <Router>
 
             <div id="mainDir">
                 <ToastContainer 
@@ -124,7 +123,6 @@ class Layout extends React.Component {
                 </>
                 {/* </Container> */}
             </div>
-            </Router>
 
         );
     }
