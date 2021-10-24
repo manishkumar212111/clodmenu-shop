@@ -99,6 +99,13 @@ class Layout extends React.Component {
                   <Header />
                   <div id="main" className={'inner-page'} onScroll={(e) => this.handleScroll(e)}>
                       <Switch>
+
+                        <Route 
+                          path = "/"
+                          component= {Home}
+                          exact= {true} 
+                        />
+                        
                         <Route 
                           path = "/:restaurantId/:clientId/:tableNo"
                           component= {Home}
@@ -109,11 +116,6 @@ class Layout extends React.Component {
                           component= {Cart}
                         />
 
-                        <Route 
-                          path = "/"
-                          component= {Home}
-                          exact= {true} 
-                        />
     
                         {/* { routes.map( route => <Route { ...route } /> ) } */}
                       </Switch>
