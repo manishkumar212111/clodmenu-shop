@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router,Switch, Route } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { connect } from "react-redux";
@@ -94,9 +94,11 @@ class Layout extends React.Component {
                 <>
                   <Header />
                   <div id="main" className={'inner-page'} onScroll={(e) => this.handleScroll(e)}>
-                    <Switch>
-                      { routes.map( route => <Route key={ route.path } { ...route } /> ) }
-                    </Switch>
+                    <Router>
+                      <Switch>
+                        { routes.map( route => <Route exact key={ route.path } { ...route } /> ) }
+                      </Switch>
+                    </Router>
                   </div>
                   <Footer />
                 </>
