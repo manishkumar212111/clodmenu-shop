@@ -96,7 +96,7 @@ class Layout extends React.Component {
                 <>
                   <Header />
                   <div id="main" className={'inner-page'} onScroll={(e) => this.handleScroll(e)}>
-                    {/* <Router> */}
+                    <Router>
                       <Switch>
                         <Route 
                           path = "/:restaurantId/:clientId/:tableNo"
@@ -112,7 +112,7 @@ class Layout extends React.Component {
     
                         {/* { routes.map( route => <Route { ...route } /> ) } */}
                       </Switch>
-                    {/* </Router> */}
+                    </Router>
                   </div>
                   <Footer />
                 </>
