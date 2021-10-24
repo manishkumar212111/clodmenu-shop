@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router,Switch, Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { connect } from "react-redux";
@@ -106,7 +106,8 @@ class Layout extends React.Component {
                         />
                         
                         <Route 
-                          path = "/:restaurantId/:clientId/:tableNo"
+                          path="/tst"
+                          // path = "/:restaurantId/:clientId/:tableNo"
                           component= {Home}
                         />
                         
