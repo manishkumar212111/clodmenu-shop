@@ -109,6 +109,12 @@ class Layout extends React.Component {
                           component= {Cart}
                           exact= {true} 
                         />
+
+                        <Route 
+                          path = "/"
+                          component= {Home}
+                          exact= {true} 
+                        />
     
                         {/* { routes.map( route => <Route { ...route } /> ) } */}
                       </Switch>
