@@ -79,6 +79,8 @@ class Layout extends React.Component {
       console.log(this.state, this.props);
 
         return (
+          <Router>
+
             <div id="mainDir">
                 <ToastContainer 
                     position="top-right"
@@ -96,7 +98,6 @@ class Layout extends React.Component {
                 <>
                   <Header />
                   <div id="main" className={'inner-page'} onScroll={(e) => this.handleScroll(e)}>
-                    <Router>
                       <Switch>
                         <Route 
                           path = "/:restaurantId/:clientId/:tableNo"
@@ -116,12 +117,13 @@ class Layout extends React.Component {
     
                         {/* { routes.map( route => <Route { ...route } /> ) } */}
                       </Switch>
-                    </Router>
                   </div>
                   <Footer />
                 </>
                 {/* </Container> */}
             </div>
+            </Router>
+
         );
     }
 }
