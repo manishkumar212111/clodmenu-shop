@@ -5,6 +5,11 @@ import Cart from "./components/pages/cart";
 
 const Route = [
     {
+        path: "/",
+        component: Home,
+        exact: true,
+    },
+    {
         path: "/cart",
         component: Cart,
         exact: true,
