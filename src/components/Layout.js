@@ -96,7 +96,7 @@ class Layout extends React.Component {
                   <div id="main" className={'inner-page'} onScroll={(e) => this.handleScroll(e)}>
                     <Router>
                       <Switch>
-                        { routes.map( route => <Route exact key={ route.path } { ...route } /> ) }
+                        { routes.map( route => <Route { ...route } /> ) }
                       </Switch>
                     </Router>
                   </div>
