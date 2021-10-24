@@ -6,6 +6,8 @@ import { connect } from "react-redux";
 import Header from "./Header";
 import routes from "../routes";
 import Footer from "./Footer";
+import Home from "./pages/Home";
+import Cart from "./pages/cart";
 // import { Container } from 'react-bootstrap'
 
 
@@ -96,7 +98,19 @@ class Layout extends React.Component {
                   <div id="main" className={'inner-page'} onScroll={(e) => this.handleScroll(e)}>
                     <Router>
                       <Switch>
-                        { routes.map( route => <Route { ...route } /> ) }
+                        <Route 
+                          path = "/:restaurantId/:clientId/:tableNo"
+                          component= {Home}
+                          exact= {true} 
+                        />
+                        
+                        <Route 
+                          path = "/cart"
+                          component= {Cart}
+                          exact= {true} 
+                        />
+    
+                        {/* { routes.map( route => <Route { ...route } /> ) } */}
                       </Switch>
                     </Router>
                   </div>
