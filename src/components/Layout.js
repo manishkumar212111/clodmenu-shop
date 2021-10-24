@@ -101,13 +101,11 @@ class Layout extends React.Component {
                         <Route 
                           path = "/:restaurantId/:clientId/:tableNo"
                           component= {Home}
-                          exact= {true} 
                         />
                         
                         <Route 
                           path = "/cart"
                           component= {Cart}
-                          exact= {true} 
                         />
 
                         <Route 
