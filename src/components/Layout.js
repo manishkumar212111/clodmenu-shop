@@ -106,8 +106,7 @@ class Layout extends React.Component {
                         />
                         
                         <Route 
-                          path="/tst"
-                          exact// path = "/:restaurantId/:clientId/:tableNo"
+                          path = "/:restaurantId/:clientId/:tableNo"
                           component= {Home}
                         />
                         
