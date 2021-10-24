@@ -5,7 +5,7 @@ import Cart from "./components/pages/cart";
 
 const Route = [
     {
-        path: "/",
+        path: "/:restaurantId/:clientId/:tableNo",
         component: Home,
         exact: true,
     },
@@ -15,16 +15,10 @@ const Route = [
         exact: true,
     },
     {
-        path: "/:restaurantId",
+        path: "/",
         component: Home,
         exact: true,
     },
-    {
-        path: "/:restaurantId/:clientId/:tableNo",
-        component: Home,
-        exact: true,
-    },
-    
     // {
     //     path: "/:userName/:productId",
     //     component: Detail,
