@@ -153,6 +153,7 @@ const Home = (props) => {
   }, []);
 
   const groupBy = function (xs, key) {
+    xs = xs.sort((a, b) => a.category?.sort - b.category?.sort);
     return xs.reduce(function (rv, x) {
       (rv[localStorage.getItem("language") == "en" ?  x.category?.name : x.category?.nameAr] = rv[localStorage.getItem("language") == "en" ?  x.category?.name : x.category?.nameAr] || []).push(x);
       return rv;
