@@ -248,7 +248,7 @@ const Home = (props) => {
     <>
       <section data-select-name className="restaurant-header">
         <div className="restaurant-image">
-          <img height="160" src={BASE_URL + restaurant.menu?.bannerImage} alt="" />
+          <img height="160" src={restaurant.menu?.bannerImage} alt="" />
           <div className="lang-select select_location">
           <div class="lang-select select_location">
             <div class="select">
