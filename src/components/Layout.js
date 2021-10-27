@@ -104,7 +104,10 @@ class Layout extends React.Component {
                           component= {Home}
                           exact= {true} 
                         />
-                        
+                        <Route 
+                          path = "/:restaurantId/:clientId"
+                          component= {Home}
+                        />
                         <Route 
                           path = "/:restaurantId/:clientId/:tableNo"
                           component= {Home}
