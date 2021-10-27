@@ -189,7 +189,7 @@ const Cart = (props) => {
         : "",
       subTotalAmount: getPriceCountInCart(),
       tax: calculateTax(),
-      totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()),
+      totalAmount: (parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())).toFixed(2),
       paymentType: paymentObj.type,
       paymentStatus:
         paymentObj.type == "cash" || paymentObj.type == "mada"
@@ -228,7 +228,7 @@ const Cart = (props) => {
               : "",
             subTotalAmount: getPriceCountInCart(),
             tax: calculateTax(),
-            totalAmount: parseFloat(getPriceCountInCart()) + parseFloat(calculateTax()).toFixed(2),
+            totalAmount: (parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())).toFixed(2),
             paymentType: paymentObj.type,
         } , (res) => {
           setCheckoutDetail(res);
