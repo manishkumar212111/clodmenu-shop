@@ -46,17 +46,17 @@ const Home = (props) => {
       });
       localStorage.setItem("language",localStorage.getItem("language") || props.restaurant?.menu?.settings?.language);
       setLanguage(localStorage.getItem("language") || props.restaurant?.menu?.settings?.language);
-    
+      
     }
     localStorage.setItem("tableNo" , props.match.params.tableNo);
 
   }, [props.restaurant]);
 
   useEffect(() => {
-    console.log("In language change")
-      setLanguage(localStorage.getItem("language") | 'en');
-      document.getElementById("mainDir").dir = localStorage.getItem("language") == "en" ? "ltr" : "rtl";  
-  }, [props.language]);
+    if(language)
+     document.getElementById("mainDir").dir = (props.language || language) == "en" ? "ltr" : "rtl";  
+    
+  }, [language, props.language]);
 
   useEffect(() => {
     if (props.productList && props.productList.length) {
