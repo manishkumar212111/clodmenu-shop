@@ -207,7 +207,9 @@ const Cart = (props) => {
     // unloadWidget()
     $("#payCash").show();
     $(".tempC a").removeClass("active");
-
+    if(paymentObj.type == "card" && document.getElementById("card").nextSibling){
+      document.getElementById("card").nextSibling.style.display = "none"
+    }
     setTimeout(() => {
       setPaymentObj((pto) => ({ ...pto, type: "cash" }))
     }, 500)
@@ -231,6 +233,8 @@ const Cart = (props) => {
             totalAmount: (parseFloat(getPriceCountInCart()) + parseFloat(calculateTax())).toFixed(2),
             paymentType: paymentObj.type,
         } , (res) => {
+          setLoading(false)
+
           setCheckoutDetail(res);
           console.log(res);
           var tag = document.createElement('script');
@@ -289,8 +293,11 @@ const Cart = (props) => {
                   $("#"+this.id+" a").addClass("active");
                   $("#payCash").hide();
                   $(this).next().slideToggle();
+                  setTimeout(() => {
+                    document.getElementById(this.id).scrollIntoView({behavior: "smooth", block: "start"})
+
+                  }, 500)
                 });
-                setLoading(false)
 
               }
             }
