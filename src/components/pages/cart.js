@@ -268,6 +268,7 @@ const Cart = (props) => {
               "virtualAccount-VSTATION_V": " Click to pay with voucherstation",
               // "virtualAccount-PAYPAL": " Click to pay with PayPal",
               "virtualAccount-APPLEPAY": "Pay With APPLEPAY",
+              "virtualAccount-GOOGLEPAY": "Pay With Google Pay",
               "virtualAccount-UKASH": " Click to pay with Ukash",
               "virtualAccount-QOOQO": " Click to pay with QOOQO",
               "virtualAccount-KLARNA_INVOICE": " Click to pay with Klarna Invoice",
@@ -281,14 +282,17 @@ const Cart = (props) => {
                 maskCvv: true,
                 brandDetectionType: "binlist",
                 brandDetectionPriority: ["MADA","VISA","MAESTRO","MASTER"],
-  
+                applePay: {
+                  displayName: "MyStore",
+                  total: { label: "COMPANY, INC." }
+                },
               onReady: function() {
                 setLoadingMore(false);
                 // <ul class="payment-option"><li><a class=""><i class="bx bx-wallet"></i> Pay Cash</a></li></ul></div>
                 $('.wpwl-container').each(function() {
                   var id = $(this).attr("id");
                   console.log(id, "Id")
-                  wrapElement(this).hide().before("<div  id='" + (id.indexOf("card")> -1 ? "card" : id.indexOf("APPLEPAY") > -1 ? "applepay" : "") + "' class='pay-method tempC' style='margin-top : 5px;'><ul class='payment-option'><li><a> <i class='bx bx-credit-card-alt'></i> " + methodMapping[id.substring(0, id.lastIndexOf("_"))] + "</a></li></ul></div>");
+                  wrapElement(this).hide().before("<div  id='" + (id.indexOf("card")> -1 ? "card" : id.indexOf("GOOGLEPAY") > -1 ? "googlepay" : id.indexOf("APPLEPAY") > -1 ? "applepay": "") + "' class='pay-method tempC' style='margin-top : 5px;'><ul class='payment-option'><li><a> <i class='bx bx-credit-card-alt'></i> " + methodMapping[id.substring(0, id.lastIndexOf("_"))] + "</a></li></ul></div>");
                 });
                 $(".tempC").click(function() {
                   console.log(this.id)
@@ -402,7 +406,7 @@ const Cart = (props) => {
     );
   }
 console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""} ${restaurant?.menu?.settings?.payment?.creditCard ? "VISA MASTER AMEX " : ""} ${restaurant?.menu?.settings?.payment?.mada ? "MADA" : ""}`)
-  let paymentTypeList = " ";
+  let paymentTypeList = "GOOGLEPAY ";
   if(restaurant?.menu?.settings?.payment.creditCard){
     paymentTypeList += "VISA MASTER AMEX "
   }
