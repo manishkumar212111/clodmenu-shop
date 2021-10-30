@@ -793,3 +793,58 @@ h4.payHead {
 .wpwl-wrapper-brand {
   display: none;
 }
+
+.wpwl-control {
+  border: none;
+  border-bottom: 1px solid #D4D3D3;
+  background-color: transparent;
+  height: 50px;
+  padding: 0 25px;
+}
+.wpwl-control-cardNumber {
+  background-image: url(img/credit-card.svg);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+.wpwl-control-expiry {
+  background-image: url(img/calendar.svg);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+.wpwl-control-cardHolder {
+  background-image: url(img/user.svg);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+.wpwl-control-cvv {
+  background-image: url(img/hint.svg);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+.wpwl-control::-webkit-input-placeholder {
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.wpwl-control:-ms-input-placeholder {
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.wpwl-control::placeholder {
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+}
+.wpwl-brand-card {
+  // display: none;
+}
+.wpwl-form {
+  margin-top: 20px;
+}
+
+.align-right {
+  text-align: right;
+}

@@ -297,7 +297,7 @@ const Home = (props) => {
 
       <section className="menu-wrapper">
         <div className="container-fluid">
-          <h3>{t("MENU")}</h3>
+          <h3 className={`${localStorage.getItem("language") == "en" ? "" : "align-right"}`}>{t("MENU")}</h3>
           <nav className="navigation" id="mainNav">
             {Object.keys(products).map((itm, index) => (
               <span
@@ -315,9 +315,9 @@ const Home = (props) => {
                   products[item].map((itm, index) => (
                     <li>
                       <div className="dish-name">
-                        <h4>{localStorage.getItem("language") == "en" ? itm.title : itm.titleAr}</h4>
+                        <h4 className={`${localStorage.getItem("language") == "en" ? "" : "align-right"}`}>{localStorage.getItem("language") == "en" ? itm.title : itm.titleAr}</h4>
                         <p className="more">{localStorage.getItem("language") == "en" ? itm.description : itm.descriptionAr}</p>
-                        <h5><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {itm.sellingPrice}</h5>
+                        <h5 className={`${localStorage.getItem("language") == "en" ? "" : "align-right"}`}><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {itm.sellingPrice}</h5>
                       </div>
                       <div className="dish-img">
                         {itm.imageUrl && <img

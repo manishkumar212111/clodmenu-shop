@@ -14,6 +14,7 @@ const Cart = (props) => {
   const [checkoutDetail , setCheckoutDetail] = useState({});
   const [showPayment, setShowPayment] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [queryObj , setQueryObj] = useState({});
   const [restaurant, setRestaurant] = useState(
     JSON.parse(localStorage.getItem("restaurant"))
@@ -234,7 +235,7 @@ const Cart = (props) => {
             paymentType: paymentObj.type,
         } , (res) => {
           setLoading(false)
-
+          setLoadingMore(true);
           setCheckoutDetail(res);
           console.log(res);
           var tag = document.createElement('script');
@@ -278,7 +279,11 @@ const Cart = (props) => {
                 locale: localStorage.getItem("language") == "en" ? "en" : "ar",
                 style: "plain",
                 maskCvv: true,
+                brandDetectionType: "binlist",
+                brandDetectionPriority: ["MADA","VISA","MAESTRO","MASTER"],
+  
               onReady: function() {
+                setLoadingMore(false);
                 // <ul class="payment-option"><li><a class=""><i class="bx bx-wallet"></i> Pay Cash</a></li></ul></div>
                 $('.wpwl-container').each(function() {
                   var id = $(this).attr("id");
@@ -407,6 +412,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
   if(restaurant?.menu?.settings?.payment.applePay){
     paymentTypeList += "APPLEPAY "
   }
+  console.log(paymentTypeList)
   if (showPayment) {
     return (
       <section className="app-body paymentPage">
@@ -440,6 +446,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                   </li>}
                 </ul>
               </div>
+              {!loading && loadingMore && <div><br></br>Loading More Payment options</div>}
                <div style={{ marginTop: 10}}>
                   <form 
                     id="my-payment-form"
@@ -451,7 +458,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
 
                   </form>
                 </div>
-              {(paymentObj.type === "cash" && !loading)  && (
+              {(paymentObj.type === "cash" && !loading && !loadingMore)  && (
                 <div class="cash-content">
                   <img
                     class="img-fluid"
@@ -467,7 +474,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
           </div>
         </div>
 
-        {paymentObj.type == "cash" && <div id="payCash" className="order-btn">
+        {paymentObj.type == "cash"  && <div id="payCash" className="order-btn">
           <div className="container-fluid">
             <a onClick={() => handleCreateOrder()}>
               <h6>{paymentObj.type == "card" ? t("use this card") : t("Pay Cash")}</h6>
