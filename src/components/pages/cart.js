@@ -320,7 +320,7 @@ const Cart = (props) => {
 
   if (props.order_detail_loading) {
     return (
-      <section class="app-body">
+      <section class="app-body" dir={localStorage.getItem("language") == "en" ? "" : "rtl"}>
         <header>
           <div class="container-fluid d-flex">
             <h4>{t("Order")}</h4>
@@ -347,7 +347,7 @@ const Cart = (props) => {
 
   if (props?.orderDetail?.id || (queryObj["?type"] && queryObj?.orderId)) {
     return (
-      <section class="app-body">
+      <section class="app-body" dir={localStorage.getItem("language") == "en" ? "" : "rtl"}>
         <header>
           <div class="container-fluid d-flex">
             <h4>{t("Order on the way")}</h4>
@@ -386,11 +386,11 @@ const Cart = (props) => {
 
   if (!Object.keys(cart).length) {
     return (
-      <section className="app-body">
+      <section className="app-body" dir={localStorage.getItem("language") == "en" ? "" : "rtl"}>
         <header>
           <div className="container-fluid d-flex">
             <span onClick={() => handleBackClick()}>
-              <i className="bx bx-chevron-left"></i>
+              {localStorage.getItem("language") == "en" ? <i className="bx bx-chevron-left"></i> : <i className="bx bx-chevron-right"></i>}
             </span>
             <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
           </div>
@@ -419,11 +419,11 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
   console.log(paymentTypeList)
   if (showPayment) {
     return (
-      <section className="app-body paymentPage">
+      <section className="app-body paymentPage" dir={localStorage.getItem("language") == "en" ? "" : "rtl"}>
         <header>
           <div className="container-fluid d-flex">
             <span onClick={() => setShowPayment(false)}>
-              <i className="bx bx-chevron-left"></i>
+              {localStorage.getItem("language") == "en" ? <i className="bx bx-chevron-left"></i> : <i className="bx bx-chevron-right"></i>}
             </span>
             <h4>{t("payments")}</h4>
           </div>
@@ -492,11 +492,11 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
   const totalAmount = parseFloat(getPriceCountInCart()) + parseFloat(calculateTax());
   console.log(orderObj);
   return (
-    <section className="app-body">
+    <section className="app-body" dir={localStorage.getItem("language") == "en" ? "" : "rtl"}>
       <header>
         <div className="container-fluid d-flex">
           <span onClick={() => handleBackClick()}>
-            <i className="bx bx-chevron-left"></i>
+            {localStorage.getItem("language") == "en" ? <i className="bx bx-chevron-left"></i> : <i className="bx bx-chevron-right"></i>}
           </span>
           <h4>{t("Your Cart")} ({getTotalProductCount()})</h4>
         </div>

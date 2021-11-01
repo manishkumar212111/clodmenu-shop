@@ -6,6 +6,7 @@ const translate = {
     "ADD" : "إضافة",
     "Calorie": "كالوري",
     "Select Upto": "Select Upto",
+    "extra add ons" : "extra add ons",
     "ADD ITEM" : "إضافة",
     "Total" : "المجموع",
     "Order": "Order",
