@@ -328,6 +328,11 @@ input#number1 {
   background: #DA3643;
 }
 
+.radio-item-ar input[type=radio]:checked + label:after {
+  right: 11px;
+  left : 0px;
+} 
+
 .total-amount {
   background: #FFF6F7;
   padding: 15px 0;

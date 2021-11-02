@@ -563,7 +563,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
             <div className="order-deliver-option">
               <ul>
                 <li>
-                  <div className="radio-item">
+                  <div className={`radio-item ${localStorage.getItem("language") == "ar" ? "radio-item-ar" : ""}`}>
                     <input
                       type="radio"
                       id="orderTyp"
