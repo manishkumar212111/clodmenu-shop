@@ -447,6 +447,11 @@ ul.payment-option li:last-child {
   background-repeat: no-repeat;
   background-position: right center;
 }
+.payment-option li a.activeAr {
+  background-image: url(./img/tick.svg);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
 .payment-option li a i {
   color: #2d2d2d;
   font-size: 25px;
