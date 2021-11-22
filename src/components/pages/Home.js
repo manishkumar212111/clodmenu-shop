@@ -192,7 +192,8 @@ const Home = (props) => {
               {getTotalProductCount()} {t("items in cart")} <span><span className="arabicRs">S<span className="arabicSmallRs">R</span></span> {price}</span>
             </p>
             <h5>
-              {t("view cart")} <i className="bx bx-chevron-right"></i>
+            
+            {localStorage.getItem("language") !="en" ? <i className="bx bx-chevron-right"></i> : ''} {t("view cart")} {localStorage.getItem("language") =="en" ? <i className="bx bx-chevron-right"></i> : ''}
             </h5>
           </a>
         </div>
