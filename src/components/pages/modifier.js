@@ -287,7 +287,7 @@ const Modifier = ({ activeProduct, modifier, handleClose, handleCartAdd , alread
                               {itm.modifiers &&
                                 itm.modifiers.map((it) => (
                                   <li>
-                                    <p>{localStorage.getItem("language") == "en" ? it.name : itm.nameAr }</p>
+                                    <p>{localStorage.getItem("language") == "en" ? it.name : it.nameAr }</p>
                                     <div className="radio-item">
                                       <span for="table-order">
                                         <span className="arabicRs">S<span className="arabicSmallRs">R</span></span>

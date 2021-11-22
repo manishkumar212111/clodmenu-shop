@@ -207,7 +207,7 @@ const Cart = (props) => {
       // };
     // unloadWidget()
     $("#payCash").show();
-    $(".tempC a").removeClass("active");
+    $(".tempC a").removeClass(localStorage.getItem("language") == "ar" ? "activeAr" : "active");
     if(paymentObj.type == "card" && document.getElementById("card").nextSibling){
       document.getElementById("card").nextSibling.style.display = "none"
     }
@@ -297,9 +297,9 @@ const Cart = (props) => {
                 $(".tempC").click(function() {
                   console.log(this.id)
                   setPaymentObj((pto) => ({ ...pto, type: this.id}));
-                  $(".tempC a").removeClass("active");
+                  $(".tempC a").removeClass(localStorage.getItem("language") == "ar" ? "activeAr" : "active");
 
-                  $("#"+this.id+" a").addClass("active");
+                  $("#"+this.id+" a").addClass(localStorage.getItem("language") == "ar" ? "activeAr" : "active");
                   $("#payCash").hide();
                   $(this).next().slideToggle();
                   setTimeout(() => {
@@ -444,7 +444,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                       handleCashClick()
                     }
                   >
-                    <a className={paymentObj.type == "cash" ? "active" : ""}>
+                    <a className={paymentObj.type == "cash" ? localStorage.getItem("language") == "ar" ? "activeAr" : "active" : ""}>
                       <i className="bx bx-wallet"></i> {("Pay Cash")}
                     </a>
                   </li>}
