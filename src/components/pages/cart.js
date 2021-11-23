@@ -504,7 +504,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
       <div className="browser-main">
         <div className="cart-area">
           <div className="container-fluid">
-            <ul>
+            <ul> 
               {Object.keys(cart).map((itm) =>
                 Object.keys(cart[itm]).map((item) => (
                   <li>
@@ -547,7 +547,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
         <div className="order-instruction">
           <div className="container-fluid">
             <div className="instruction">
-              <h5>{t("Order Instructions")}</h5>
+              <h5 style={{ textAlign: localStorage.getItem("language") == "ar" ? "right" : "left" }}>{t("Order Instructions")}</h5>
               <textarea
                 name=""
                 placeholder={t("Ex - Do not put bell pepper in pizza, serve beer chilled")}
@@ -654,7 +654,7 @@ console.log(`${restaurant?.menu?.settings?.payment?.applePay ? "APPLEPAY " : ""}
                 {t("Total")} <span>SR {totalAmount}</span>
               </p>
               <h5>
-                {t("Place Order")} <i className="bx bx-chevron-right"></i>
+              {localStorage.getItem("language") !="en" ? <i className="bx bx-chevron-right"></i> : ''} {t("Place Order")} {localStorage.getItem("language") =="en" ? <i className="bx bx-chevron-right"></i> : ''}
               </h5>
             </a>
           </div>
@@ -674,6 +674,7 @@ const mapDispatchToProps = {
   create,
   createPayment
 };
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cart);
 
