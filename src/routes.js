@@ -5,7 +5,7 @@ import Cart from "./components/pages/cart";
 
 const Route = [
     {
-        path: "/:restaurantId/:clientId/:tableNo",
+        path: "/:clientId/:tableNo",
         component: Home,
         exact: true,
     },

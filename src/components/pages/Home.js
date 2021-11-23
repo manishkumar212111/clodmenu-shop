@@ -25,7 +25,7 @@ const Home = (props) => {
   const [language, setLanguage] = useState("en");
   const [langSelect, setLangSelect] = useState(false);
   useEffect(() => {
-    props.getRestaurantById(props.match.params.restaurantId);
+    props.getRestaurantById(window.location.href.split("//")[1].split(".")[0]);
   }, [props.getRestaurantById]);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const Home = (props) => {
     if(props.restaurant && props.restaurant.menu){
       props.getProductByUserId({
         menu: props.restaurant.menu.id,
-        restaurant: props.match.params.restaurantId,
+        restaurant: props.restaurant.id,
         limit: 5000,
       });
       localStorage.setItem("language",localStorage.getItem("language") || props.restaurant?.menu?.settings?.language);

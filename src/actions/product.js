@@ -32,7 +32,7 @@ export const getRestaurantById = (id) => dispatch =>{
           type : "PRODUCT_DETAIL_LOADING",
           data : true
       })
-    API.get('Restaurant' , {}, id , function(res){
+    API.get('Restaurant' , {url_key : id}, "" , function(res){
       
       if(res && res.data){
           dispatch( { type: "RESTAURANT_DETAIL",
